@@ -1,0 +1,30 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35013.160
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NLM_Color_GPU_wiersz", "NLM_Color_GPU_wiersz.vcxproj", "{78A6CC79-7FA6-45FB-B3BD-2A557E773C92}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Elementy rozwiązania", "Elementy rozwiązania", "{25909282-453E-44ED-B7FB-EBDB791BBE81}"
+	ProjectSection(SolutionItems) = preProject
+		NLM_Color_GPU_wiersz.cu = NLM_Color_GPU_wiersz.cu
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{78A6CC79-7FA6-45FB-B3BD-2A557E773C92}.Debug|x64.ActiveCfg = Debug|x64
+		{78A6CC79-7FA6-45FB-B3BD-2A557E773C92}.Debug|x64.Build.0 = Debug|x64
+		{78A6CC79-7FA6-45FB-B3BD-2A557E773C92}.Release|x64.ActiveCfg = Release|x64
+		{78A6CC79-7FA6-45FB-B3BD-2A557E773C92}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {52F7E2E6-3096-4132-93DC-664D0F032B79}
+	EndGlobalSection
+EndGlobal
