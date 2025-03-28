@@ -11,13 +11,12 @@ marwod@interia.pl
 #include <math.h>
 #include <cmath>
 #include <cuda_runtime.h>
-#include <conio.h>
 #include <iostream>
 #include "naglowek_struktury.h"
 
-#define ROZMIAR_OBSZARU_PRZESZUKANIA       32 //wartoœæ w iloœci ³atek i u¿ywanych w¹tków. rozmiar w pixelax wyniesie 40 (po dodaniu rozmiaru ³atki
+#define ROZMIAR_OBSZARU_PRZESZUKANIA       32 //wartosc w ilosci latek i uzywanych watkow. rozmiar w pixelax wyniesie 40 (po dodaniu rozmiaru latki
 #define ROZMIAR_LATKI       8
-#define RZECZYWISTY_ROZMIAR_OBSZARU_PRZESZUKANIA 40 // ROZMIAR_PRZESZUKANIA +ROZMIAR_£ATKI iloœæ pixeli obszaru przeszukania
+#define RZECZYWISTY_ROZMIAR_OBSZARU_PRZESZUKANIA 40 // ROZMIAR_PRZESZUKANIA +ROZMIAR_LATKI ilosc pixeli obszaru przeszukania
 #define POWIERZCHNIA_LATKI       64
 #define N_WIEN     32
 
@@ -100,7 +99,7 @@ __global__ void DCT(Obrazek_YCrCb Tablice_Latek_Transformowanych, int rozmiar_la
 
             __syncthreads();
 
-            for (int k = 0; k < ROZMIAR_LATKI; k++) // K mniejsze ni¿ rozmir Latki
+            for (int k = 0; k < ROZMIAR_LATKI; k++) // K mniejsze niz rozmir Latki
             {
                 Macierz_posrednia[threadIdx.y * ROZMIAR_LATKI + threadIdx.x] += Const_macierz_wspolczynnikow2d_1[threadIdx.y * ROZMIAR_LATKI + k] * Macierz_wejsciowa[k * ROZMIAR_LATKI + threadIdx.x];
 
@@ -121,13 +120,13 @@ __global__ void DCT(Obrazek_YCrCb Tablice_Latek_Transformowanych, int rozmiar_la
 
  
 
-        /////////////////kana³ B
+        /////////////////kanal B
         if (threadIdx.x < ROZMIAR_LATKI && threadIdx.y < ROZMIAR_LATKI)
         {
             Macierz_wejsciowa[threadIdx.y * ROZMIAR_LATKI + threadIdx.x] = Tablice_Latek_Transformowanych.kanal_Cb[indeks_komorki];
             Macierz_posrednia[threadIdx.y * ROZMIAR_LATKI + threadIdx.x] = 0;
            __syncthreads();
-            for (int k = 0; k < ROZMIAR_LATKI; k++) // K mniejsze ni¿ rozmir Latki
+            for (int k = 0; k < ROZMIAR_LATKI; k++) // K mniejsze niz rozmir Latki
             {
                 Macierz_posrednia[threadIdx.y * ROZMIAR_LATKI + threadIdx.x] += Const_macierz_wspolczynnikow2d_1[threadIdx.y * ROZMIAR_LATKI + k] * Macierz_wejsciowa[k * ROZMIAR_LATKI + threadIdx.x];
             }
@@ -147,7 +146,7 @@ __global__ void DCT(Obrazek_YCrCb Tablice_Latek_Transformowanych, int rozmiar_la
     }
 }
 
-///Przeci¹¿enie DCT dla kolejnego przekszta³cenia dwóch tablic transformaty
+///Przeciazenie DCT dla kolejnego przeksztalcenia dwoch tablic transformaty
 __global__ void DCT(Obrazek_YCrCb Tablice_Latek_Transformowanych1, 
     Obrazek_YCrCb Tablice_Latek_Transformowanych2, int rozmiar_latki_x, int rozmiar_latki_y, 
     int* device_tablica_ilosci_pasujacych_latek, int mnoznik_tablicy_transformat)
@@ -172,7 +171,7 @@ __global__ void DCT(Obrazek_YCrCb Tablice_Latek_Transformowanych1,
 
             __syncthreads();
 
-            for (int k = 0; k < ROZMIAR_LATKI; k++) // K mniejsze ni¿ rozmir Latki
+            for (int k = 0; k < ROZMIAR_LATKI; k++) // K mniejsze niz rozmir Latki
             {
                 Macierz_posrednia[threadIdx.y * ROZMIAR_LATKI + threadIdx.x] += Const_macierz_wspolczynnikow2d_1[threadIdx.y * ROZMIAR_LATKI + k] * Macierz_wejsciowa[k * ROZMIAR_LATKI + threadIdx.x];
 
@@ -198,7 +197,7 @@ __global__ void DCT(Obrazek_YCrCb Tablice_Latek_Transformowanych1,
 
                 __syncthreads();
 
-                for (int k = 0; k < ROZMIAR_LATKI; k++) // K mniejsze ni¿ rozmir Latki
+                for (int k = 0; k < ROZMIAR_LATKI; k++) // K mniejsze niz rozmir Latki
                 {
                     Macierz_posrednia[threadIdx.y * ROZMIAR_LATKI + threadIdx.x] += Const_macierz_wspolczynnikow2d_1[threadIdx.y * ROZMIAR_LATKI + k] * Macierz_wejsciowa[k * ROZMIAR_LATKI + threadIdx.x];
 
@@ -226,7 +225,7 @@ __global__ void DCT(Obrazek_YCrCb Tablice_Latek_Transformowanych1,
 
             __syncthreads();
 
-            for (int k = 0; k < ROZMIAR_LATKI; k++) // K mniejsze ni¿ rozmir Latki
+            for (int k = 0; k < ROZMIAR_LATKI; k++) // K mniejsze niz rozmir Latki
             {
                 Macierz_posrednia[threadIdx.y * ROZMIAR_LATKI + threadIdx.x] += Const_macierz_wspolczynnikow2d_1[threadIdx.y * ROZMIAR_LATKI + k] * Macierz_wejsciowa[k * ROZMIAR_LATKI + threadIdx.x];
 
@@ -252,7 +251,7 @@ __global__ void DCT(Obrazek_YCrCb Tablice_Latek_Transformowanych1,
 
                 __syncthreads();
 
-                for (int k = 0; k < ROZMIAR_LATKI; k++) // K mniejsze ni¿ rozmir Latki
+                for (int k = 0; k < ROZMIAR_LATKI; k++) // K mniejsze niz rozmir Latki
                 {
                     Macierz_posrednia[threadIdx.y * ROZMIAR_LATKI + threadIdx.x] += Const_macierz_wspolczynnikow2d_1[threadIdx.y * ROZMIAR_LATKI + k] * Macierz_wejsciowa[k * ROZMIAR_LATKI + threadIdx.x];
 
@@ -272,7 +271,7 @@ __global__ void DCT(Obrazek_YCrCb Tablice_Latek_Transformowanych1,
             }
 
         
-        /////////////////kana³ B
+        /////////////////kanal B
         if (threadIdx.x < ROZMIAR_LATKI && threadIdx.y < ROZMIAR_LATKI)
         {
             Macierz_wejsciowa[threadIdx.y * ROZMIAR_LATKI + threadIdx.x] = Tablice_Latek_Transformowanych1.kanal_Cb[indeks_komorki];
@@ -280,7 +279,7 @@ __global__ void DCT(Obrazek_YCrCb Tablice_Latek_Transformowanych1,
 
             __syncthreads();
 
-            for (int k = 0; k < ROZMIAR_LATKI; k++) // K mniejsze ni¿ rozmir Latki
+            for (int k = 0; k < ROZMIAR_LATKI; k++) // K mniejsze niz rozmir Latki
             {
                 Macierz_posrednia[threadIdx.y * ROZMIAR_LATKI + threadIdx.x] += Const_macierz_wspolczynnikow2d_1[threadIdx.y * ROZMIAR_LATKI + k] * Macierz_wejsciowa[k * ROZMIAR_LATKI + threadIdx.x];
 
@@ -306,7 +305,7 @@ __global__ void DCT(Obrazek_YCrCb Tablice_Latek_Transformowanych1,
 
                 __syncthreads();
 
-                for (int k = 0; k < ROZMIAR_LATKI; k++) // K mniejsze ni¿ rozmir Latki
+                for (int k = 0; k < ROZMIAR_LATKI; k++) // K mniejsze niz rozmir Latki
                 {
                     Macierz_posrednia[threadIdx.y * ROZMIAR_LATKI + threadIdx.x] += Const_macierz_wspolczynnikow2d_1[threadIdx.y * ROZMIAR_LATKI + k] * Macierz_wejsciowa[k * ROZMIAR_LATKI + threadIdx.x];
 
@@ -352,7 +351,7 @@ __global__ void DCT_odwrotna(Obrazek_YCrCb Tablice_Latek_transformowanych, int r
 
             for (int k = 0; k < ROZMIAR_LATKI; k++)
             {
-                //optymalne, zamaist transponowanej macierzy wspó³czynników (tak jak powinno byæ) u¿ywamy podstawowej ze zmienionym indeksowaniem rdzeni. Pozwala to zachowaæ coalescencjê dostêpu do pamiêci
+                //optymalne, zamaist transponowanej macierzy wspolczynnikow (tak jak powinno byc) uzywamy podstawowej ze zmienionym indeksowaniem rdzeni. Pozwala to zachowac coalescencje dostepu do pamieci
                 Macierz_posrednia[threadIdx.y + threadIdx.x * ROZMIAR_LATKI] += Const_macierz_wspolczynnikow2d_1[k * ROZMIAR_LATKI + threadIdx.y] * Macierz_wejsciowa[k * ROZMIAR_LATKI + threadIdx.x];
 
             }
@@ -371,7 +370,7 @@ __global__ void DCT_odwrotna(Obrazek_YCrCb Tablice_Latek_transformowanych, int r
 
         }
         __syncthreads();
-        ////////////////////////////////////////////kana³ G:
+        ////////////////////////////////////////////kanal G:
         if (threadIdx.x < ROZMIAR_LATKI && threadIdx.y < ROZMIAR_LATKI)
         {
 
@@ -387,7 +386,7 @@ __global__ void DCT_odwrotna(Obrazek_YCrCb Tablice_Latek_transformowanych, int r
 
             for (int k = 0; k < ROZMIAR_LATKI; k++)
             {
-                //optymalne, zamaist transponowanej macierzy wspó³czynników (tak jak powinno byæ) u¿ywamy podstawowej ze zmienionym indeksowaniem rdzeni. Pozwala to zachowaæ coalescencjê dostêpu do pamiêci
+                //optymalne, zamaist transponowanej macierzy wspolczynnikow (tak jak powinno byc) uzywamy podstawowej ze zmienionym indeksowaniem rdzeni. Pozwala to zachowac coalescencje dostepu do pamieci
                 Macierz_posrednia[threadIdx.y + threadIdx.x * ROZMIAR_LATKI] += Const_macierz_wspolczynnikow2d_1[k * ROZMIAR_LATKI + threadIdx.y] * Macierz_wejsciowa[k * ROZMIAR_LATKI + threadIdx.x];
 
             }
@@ -404,7 +403,7 @@ __global__ void DCT_odwrotna(Obrazek_YCrCb Tablice_Latek_transformowanych, int r
             Tablice_Latek_transformowanych.kanal_Cr[indeks_komorki] = Macierz_wejsciowa[indeks2];
 
         }
-        ////////////////////////////////////kana³ B:
+        ////////////////////////////////////kanal B:
         if (threadIdx.x < ROZMIAR_LATKI && threadIdx.y < ROZMIAR_LATKI)
         {
             Macierz_wejsciowa[indeks2] = Tablice_Latek_transformowanych.kanal_Cb[indeks_komorki];
@@ -413,7 +412,7 @@ __global__ void DCT_odwrotna(Obrazek_YCrCb Tablice_Latek_transformowanych, int r
 
             for (int k = 0; k < ROZMIAR_LATKI; k++)
             {
-                //optymalne, zamaist transponowanej macierzy wspó³czynników (tak jak powinno byæ) u¿ywamy podstawowej ze zmienionym indeksowaniem rdzeni. Pozwala to zachowaæ coalescencjê dostêpu do pamiêci
+                //optymalne, zamaist transponowanej macierzy wspolczynnikow (tak jak powinno byc) uzywamy podstawowej ze zmienionym indeksowaniem rdzeni. Pozwala to zachowac coalescencje dostepu do pamieci
                 Macierz_posrednia[threadIdx.y + threadIdx.x * ROZMIAR_LATKI] += Const_macierz_wspolczynnikow2d_1[k * ROZMIAR_LATKI + threadIdx.y] * Macierz_wejsciowa[k * ROZMIAR_LATKI + threadIdx.x];
             }
 
@@ -447,7 +446,7 @@ __global__ void Walsh_1D(Obrazek_YCrCb Tablice_Latek_transformowanych,
     if (device_tablica_ilosci_pasujacych_latek[blockIdx.z] > 1)
     {
 
-        /////////////////////////////////////////Kana³ R:
+        /////////////////////////////////////////Kanal R:
         for (int i = 0; i < 2; i++)
         {
             if (threadIdx.y < ilosc_pasujacych_latek / 2)
@@ -489,7 +488,7 @@ __global__ void Walsh_1D(Obrazek_YCrCb Tablice_Latek_transformowanych,
             }
         }
         __syncthreads();
-        ////////////////////////////////kana³ Cr:
+        ////////////////////////////////kanal Cr:
         for (int i = 0; i < 2; i++)
         {
             if (threadIdx.y < ilosc_pasujacych_latek / 2)
@@ -533,7 +532,7 @@ __global__ void Walsh_1D(Obrazek_YCrCb Tablice_Latek_transformowanych,
         }
         __syncthreads();
 
-        /////////////////////////////////kana³ B:
+        /////////////////////////////////kanal B:
         for (int i = 0; i < 2; i++)
         {
             if (threadIdx.y < ilosc_pasujacych_latek / 2)

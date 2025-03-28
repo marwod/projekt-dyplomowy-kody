@@ -9,9 +9,9 @@
 #include <cmath>
 #include "naglowek_struktury.h"
 
-#define ROZMIAR_OBSZARU_PRZESZUKANIA       32 //wartoœæ w iloœci ³atek i u¿ywanych w¹tków. rozmiar w pixelax wyniesie 40 (po dodaniu rozmiaru ³atki
+#define ROZMIAR_OBSZARU_PRZESZUKANIA       32 //wartoœæ w iloœci latek i u¿ywanych w¹tków. rozmiar w pixelax wyniesie 40 (po dodaniu rozmiaru latki
 #define ROZMIAR_LATKI       8
-#define RZECZYWISTY_ROZMIAR_OBSZARU_PRZESZUKANIA 40 // ROZMIAR_PRZESZUKANIA +ROZMIAR_£ATKI iloœæ pixeli obszaru przeszukania
+#define RZECZYWISTY_ROZMIAR_OBSZARU_PRZESZUKANIA 40 // ROZMIAR_PRZESZUKANIA +ROZMIAR_lATKI iloœæ pixeli obszaru przeszukania
 #define POWIERZCHNIA_LATKI       64
 
 

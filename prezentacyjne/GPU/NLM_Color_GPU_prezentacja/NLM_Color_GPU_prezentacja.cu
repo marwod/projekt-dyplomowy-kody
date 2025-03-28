@@ -13,7 +13,6 @@ marwod@interia.pl
 #include <time.h>
 #include <iostream>
 #include <cmath>
-#include <conio.h>
 #include <math.h>
 #include <cmath>
 #include "opencv2/opencv.hpp"
@@ -23,7 +22,7 @@ marwod@interia.pl
 
 
 
-#define MAX_WIELKOSC_OKNA_PRZESZUKANIA  31   //musi byc nieparzysty, 21 do 35 w zalezności od szumu
+#define MAX_WIELKOSC_OKNA_PRZESZUKANIA  31   //musi byc nieparzysty, 21 do 35 w zaleznosci od szumu
 
 
 struct Obrazek_RGB
@@ -50,7 +49,7 @@ __global__ void Device_Non_Local_Means(Obrazek_RGB Dev_Macierz_wejsciowa, Obraze
     float* okienko_referencyjne = (float*)&okienko[0];
     float* Okno_preszukana_shared = (float*)&okienko_referencyjne
         [wielkosc_okna_podobienstwa * wielkosc_okna_podobienstwa];
-    //Niestety nie mieści się przy polach większych niż 25*25 w extern shared memory i muszę ustawić ja na sztywno jako stałą żeby okno przeszukania mogło mieć 31 na 31
+    //Niestety nie miesci się przy polach większych niż 25*25 w extern shared memory i muszę ustawić ja na sztywno jako stalą żeby okno przeszukania moglo mieć 31 na 31
     __shared__ float tablica_wartosci_pikseli_R[MAX_WIELKOSC_OKNA_PRZESZUKANIA * MAX_WIELKOSC_OKNA_PRZESZUKANIA];
     __shared__ float tablica_wag_pikseli_R[MAX_WIELKOSC_OKNA_PRZESZUKANIA * MAX_WIELKOSC_OKNA_PRZESZUKANIA];
     __shared__ float tablica_wartosci_pikseli_G[MAX_WIELKOSC_OKNA_PRZESZUKANIA * MAX_WIELKOSC_OKNA_PRZESZUKANIA];
@@ -77,7 +76,7 @@ __global__ void Device_Non_Local_Means(Obrazek_RGB Dev_Macierz_wejsciowa, Obraze
             {
                 Okno_preszukana_shared[(threadIdx.y + wielkosc_okna_przeszukania) * rzeczywisty_obszar_przeszukania + threadIdx.x] = (Dev_Macierz_wejsciowa.kanal_R[((threadIdx.y + wielkosc_okna_przeszukania) + index_y_pixela_gorny_lewy_obszaru_przeszukania) * szerokosc + threadIdx.x + index_x_pixela_gorny_lewy_obszaru_przeszukania]);
             }
-            if ((threadIdx.x < (rzeczywisty_obszar_przeszukania - wielkosc_okna_przeszukania)) && (threadIdx.y < wielkosc_okna_przeszukania)) //przpisujemy obszar łatki do ktorej będziemy porownywać do pamięci współdzielonej bloku
+            if ((threadIdx.x < (rzeczywisty_obszar_przeszukania - wielkosc_okna_przeszukania)) && (threadIdx.y < wielkosc_okna_przeszukania)) //przpisujemy obszar latki do ktorej będziemy porownywać do pamięci wspoldzielonej bloku
             {
                 Okno_preszukana_shared[(threadIdx.y) * rzeczywisty_obszar_przeszukania + threadIdx.x + wielkosc_okna_przeszukania] = (Dev_Macierz_wejsciowa.kanal_R[(threadIdx.y + index_y_pixela_gorny_lewy_obszaru_przeszukania) * szerokosc + threadIdx.x + wielkosc_okna_przeszukania + index_x_pixela_gorny_lewy_obszaru_przeszukania]);
             }        
@@ -115,29 +114,29 @@ __global__ void Device_Non_Local_Means(Obrazek_RGB Dev_Macierz_wejsciowa, Obraze
             }
 
 
-            //2 dla składowej G/////////////////////////////////////////////////////////////
+            //2 dla skladowej G/////////////////////////////////////////////////////////////
 
             {
                 Okno_preszukana_shared[threadIdx.y * rzeczywisty_obszar_przeszukania + threadIdx.x] = (Dev_Macierz_wejsciowa.kanal_G[(threadIdx.y + index_y_pixela_gorny_lewy_obszaru_przeszukania) * szerokosc + threadIdx.x + index_x_pixela_gorny_lewy_obszaru_przeszukania]);
-                //przpisujemy obszar preszukania (37 pixeli) dla łatki do pamięci dzielonej bloku, ze względu na zmieszczenie się w dostępnej w wywołaniu funkcji iosci wątków musiałem zrealizować przypisanie w czterech krokach.
+                //przpisujemy obszar preszukania (37 pixeli) dla latki do pamięci dzielonej bloku, ze względu na zmieszczenie się w dostępnej w wywolaniu funkcji iosci wątkow musialem zrealizować przypisanie w czterech krokach.
             }
-            if ((threadIdx.x < wielkosc_okna_przeszukania) && (threadIdx.y < (rzeczywisty_obszar_przeszukania - wielkosc_okna_przeszukania))) //przpisujemy obszar łatki do ktorej będziemy porownywać do pamięci dzielonej bloku
+            if ((threadIdx.x < wielkosc_okna_przeszukania) && (threadIdx.y < (rzeczywisty_obszar_przeszukania - wielkosc_okna_przeszukania))) //przpisujemy obszar latki do ktorej będziemy porownywać do pamięci dzielonej bloku
             {
 
                 Okno_preszukana_shared[(threadIdx.y + wielkosc_okna_przeszukania) * rzeczywisty_obszar_przeszukania + threadIdx.x] = (Dev_Macierz_wejsciowa.kanal_G[((threadIdx.y + wielkosc_okna_przeszukania) + index_y_pixela_gorny_lewy_obszaru_przeszukania) * szerokosc + threadIdx.x + index_x_pixela_gorny_lewy_obszaru_przeszukania]);
             }
-            if ((threadIdx.x < (rzeczywisty_obszar_przeszukania - wielkosc_okna_przeszukania)) && (threadIdx.y < wielkosc_okna_przeszukania)) //przpisujemy obszar łatki do ktorej będziemy porownywać do pamięci dzielonej bloku
+            if ((threadIdx.x < (rzeczywisty_obszar_przeszukania - wielkosc_okna_przeszukania)) && (threadIdx.y < wielkosc_okna_przeszukania)) //przpisujemy obszar latki do ktorej będziemy porownywać do pamięci dzielonej bloku
             {
 
                 Okno_preszukana_shared[(threadIdx.y) * rzeczywisty_obszar_przeszukania + threadIdx.x + wielkosc_okna_przeszukania] = (Dev_Macierz_wejsciowa.kanal_G[(threadIdx.y + index_y_pixela_gorny_lewy_obszaru_przeszukania) * szerokosc + threadIdx.x + wielkosc_okna_przeszukania + index_x_pixela_gorny_lewy_obszaru_przeszukania]);
             }
-            if ((threadIdx.x < (rzeczywisty_obszar_przeszukania - wielkosc_okna_przeszukania)) && (threadIdx.y < (rzeczywisty_obszar_przeszukania - wielkosc_okna_przeszukania))) //przpisujemy obszar łatki do ktorej będziemy porownywać do pamięci dzielonej bloku
+            if ((threadIdx.x < (rzeczywisty_obszar_przeszukania - wielkosc_okna_przeszukania)) && (threadIdx.y < (rzeczywisty_obszar_przeszukania - wielkosc_okna_przeszukania))) //przpisujemy obszar latki do ktorej będziemy porownywać do pamięci dzielonej bloku
             {
                 Okno_preszukana_shared[(threadIdx.y + wielkosc_okna_przeszukania) * rzeczywisty_obszar_przeszukania + threadIdx.x + wielkosc_okna_przeszukania] = (Dev_Macierz_wejsciowa.kanal_G[((threadIdx.y + wielkosc_okna_przeszukania) + index_y_pixela_gorny_lewy_obszaru_przeszukania) * szerokosc + threadIdx.x + wielkosc_okna_przeszukania + index_x_pixela_gorny_lewy_obszaru_przeszukania]);
             }
             __syncthreads();
 
-            if ((threadIdx.x < wielkosc_okna_podobienstwa) && (threadIdx.y < wielkosc_okna_podobienstwa)) //przpisujemy obszar łatki do ktorej będziemy porownywać do pamięci dzielonej bloku
+            if ((threadIdx.x < wielkosc_okna_podobienstwa) && (threadIdx.y < wielkosc_okna_podobienstwa)) //przpisujemy obszar latki do ktorej będziemy porownywać do pamięci dzielonej bloku
             {
                 okienko_referencyjne[threadIdx.y * wielkosc_okna_podobienstwa + threadIdx.x] = Okno_preszukana_shared[(threadIdx.y + offset) * (rzeczywisty_obszar_przeszukania)+(threadIdx.x + offset)];
             }
@@ -165,34 +164,34 @@ __global__ void Device_Non_Local_Means(Obrazek_RGB Dev_Macierz_wejsciowa, Obraze
                 tablica_wartosci_pikseli_G[index2dObszaru] = wartosc_piksela;
             }
 
-            //3 dla składowej B/////////////////////////////////////////////////////////////
+            //3 dla skladowej B/////////////////////////////////////////////////////////////
 
             if ((threadIdx.y < wielkosc_okna_przeszukania) && (threadIdx.x < wielkosc_okna_przeszukania))
 
-                //1 dla składowej B/////////////////////////////////////////////////////////////
+                //1 dla skladowej B/////////////////////////////////////////////////////////////
             {
                 Okno_preszukana_shared[threadIdx.y * rzeczywisty_obszar_przeszukania + threadIdx.x] = (Dev_Macierz_wejsciowa.kanal_B[(threadIdx.y + index_y_pixela_gorny_lewy_obszaru_przeszukania) * szerokosc + threadIdx.x + index_x_pixela_gorny_lewy_obszaru_przeszukania]);
-                //przpisujemy obszar preszukania (37 pixeli) dla łatki do pamięci dzielonej bloku, ze względu na zmieszczenie się w dostępnej w wywołaniu funkcji iosci wątków musiałem zrealizować przypisanie w czterech krokach.
+                //przpisujemy obszar preszukania (37 pixeli) dla latki do pamięci dzielonej bloku, ze względu na zmieszczenie się w dostępnej w wywolaniu funkcji iosci wątkow musialem zrealizować przypisanie w czterech krokach.
             }
-            if ((threadIdx.x < wielkosc_okna_przeszukania) && (threadIdx.y < (rzeczywisty_obszar_przeszukania - wielkosc_okna_przeszukania))) //przpisujemy obszar łatki do ktorej będziemy porownywać do pamięci dzielonej bloku
+            if ((threadIdx.x < wielkosc_okna_przeszukania) && (threadIdx.y < (rzeczywisty_obszar_przeszukania - wielkosc_okna_przeszukania))) //przpisujemy obszar latki do ktorej będziemy porownywać do pamięci dzielonej bloku
             {
 
                 Okno_preszukana_shared[(threadIdx.y + wielkosc_okna_przeszukania) * rzeczywisty_obszar_przeszukania + threadIdx.x] = (Dev_Macierz_wejsciowa.kanal_B[((threadIdx.y + wielkosc_okna_przeszukania) + index_y_pixela_gorny_lewy_obszaru_przeszukania) * szerokosc + threadIdx.x + index_x_pixela_gorny_lewy_obszaru_przeszukania]);
             }
 
-            if ((threadIdx.x < (rzeczywisty_obszar_przeszukania - wielkosc_okna_przeszukania)) && (threadIdx.y < wielkosc_okna_przeszukania)) //przpisujemy obszar łatki do ktorej będziemy porownywać do pamięci dzielonej bloku
+            if ((threadIdx.x < (rzeczywisty_obszar_przeszukania - wielkosc_okna_przeszukania)) && (threadIdx.y < wielkosc_okna_przeszukania)) //przpisujemy obszar latki do ktorej będziemy porownywać do pamięci dzielonej bloku
             {
 
                 Okno_preszukana_shared[(threadIdx.y) * rzeczywisty_obszar_przeszukania + threadIdx.x + wielkosc_okna_przeszukania] = (Dev_Macierz_wejsciowa.kanal_B[(threadIdx.y + index_y_pixela_gorny_lewy_obszaru_przeszukania) * szerokosc + threadIdx.x + wielkosc_okna_przeszukania + index_x_pixela_gorny_lewy_obszaru_przeszukania]);
             }
-            if ((threadIdx.x < (rzeczywisty_obszar_przeszukania - wielkosc_okna_przeszukania)) && (threadIdx.y < (rzeczywisty_obszar_przeszukania - wielkosc_okna_przeszukania))) //przpisujemy obszar łatki do ktorej będziemy porownywać do pamięci dzielonej bloku
+            if ((threadIdx.x < (rzeczywisty_obszar_przeszukania - wielkosc_okna_przeszukania)) && (threadIdx.y < (rzeczywisty_obszar_przeszukania - wielkosc_okna_przeszukania))) //przpisujemy obszar latki do ktorej będziemy porownywać do pamięci dzielonej bloku
             {
                 Okno_preszukana_shared[(threadIdx.y + wielkosc_okna_przeszukania) * rzeczywisty_obszar_przeszukania + threadIdx.x + wielkosc_okna_przeszukania] = (Dev_Macierz_wejsciowa.kanal_B[((threadIdx.y + wielkosc_okna_przeszukania) + index_y_pixela_gorny_lewy_obszaru_przeszukania) * szerokosc + threadIdx.x + wielkosc_okna_przeszukania + index_x_pixela_gorny_lewy_obszaru_przeszukania]);
             }
             __syncthreads();
 
 
-            if ((threadIdx.x < wielkosc_okna_podobienstwa) && (threadIdx.y < wielkosc_okna_podobienstwa)) //przpisujemy obszar łatki do ktorej będziemy porownywać do pamięci dzielonej bloku
+            if ((threadIdx.x < wielkosc_okna_podobienstwa) && (threadIdx.y < wielkosc_okna_podobienstwa)) //przpisujemy obszar latki do ktorej będziemy porownywać do pamięci dzielonej bloku
             {
                 okienko_referencyjne[threadIdx.y * wielkosc_okna_podobienstwa + threadIdx.x] = Okno_preszukana_shared[(threadIdx.y + offset) * (rzeczywisty_obszar_przeszukania)+(threadIdx.x + offset)];
             }
@@ -311,6 +310,9 @@ __global__ void Device_Non_Local_Means(Obrazek_RGB Dev_Macierz_wejsciowa, Obraze
 
 void initializeCUDA(int argc, char** argv, int& devID)
 {
+    //funkcja na podstawie gotowego kodu udostepnionego na stronie :
+    //https://github.com/NVIDIA/cuda-samples/blob/master/Samples/4_CUDA_Libraries/matrixMulCUBLAS/matrixMulCUBLAS.cpp
+    //linie 149 - 178
     cudaError_t error;
     devID = 0;
     //pobiera wersję SMs dla GPU
@@ -334,7 +336,7 @@ void initializeCUDA(int argc, char** argv, int& devID)
 void dodanie_szumu(cv::Mat obrazek_zaszumiony, float sigm, int ilosc_kanalow)
 {
 
-    double sigma = sigm; // Wartość sigma dla szumu gaussowskiego
+    double sigma = sigm; // Wartosć sigma dla szumu gaussowskiego
 
     // Generator liczb losowych dla szumu gaussowskiego
     std::default_random_engine generator;
@@ -350,8 +352,8 @@ void dodanie_szumu(cv::Mat obrazek_zaszumiony, float sigm, int ilosc_kanalow)
                 for (int c = 0; c < 1; c++)
                 {
                     double szum = distribution(generator);
-                    int new_value = cv::saturate_cast<uchar>(pixele[c] + szum);
-                    pixele[c] = new_value;
+                    int nowa_wartosc = cv::saturate_cast<uchar>(pixele[c] + szum);
+                    pixele[c] = nowa_wartosc;
                 }
             }
             else
@@ -360,12 +362,10 @@ void dodanie_szumu(cv::Mat obrazek_zaszumiony, float sigm, int ilosc_kanalow)
                 for (int c = 0; c < 3; c++)
                 {
                     double szum = distribution(generator);
-                    int new_value = cv::saturate_cast<uchar>(pixele[c] + szum);
-                    pixele[c] = new_value;
+                    int nowa_wartosc = cv::saturate_cast<uchar>(pixele[c] + szum);
+                    pixele[c] = nowa_wartosc;
                 }
             }
-
-
         }
     }
 }
@@ -613,7 +613,7 @@ Bodues = true;
     cudaMemcpy(wskaznik_dev_Macierz_wejsciowa->kanal_G, wskaznik_host_Macierz_wejsciowa->kanal_G, wielkosc_tablicy_z_marginesami * sizeof(float), cudaMemcpyHostToDevice);
     cudaMemcpy(wskaznik_dev_Macierz_wejsciowa->kanal_B, wskaznik_host_Macierz_wejsciowa->kanal_B, wielkosc_tablicy_z_marginesami * sizeof(float), cudaMemcpyHostToDevice);
     cudaDeviceSynchronize();
-    cudaFuncSetCacheConfig(Device_Non_Local_Means, cudaFuncCachePreferShared); //zwiększamy ilość dostępnej pamięci shared memory
+    cudaFuncSetCacheConfig(Device_Non_Local_Means, cudaFuncCachePreferShared); //zwiększamy ilosć dostępnej pamięci shared memory
     dim3 bloki_NLM(ilosc_blokow_w_boku_x, ilosc_blokow_w_boku_y, 1);
     dim3 watki_NLM(wielkosc_okna_przeszukania, wielkosc_okna_przeszukania, 1);
     Device_Non_Local_Means << <bloki_NLM, watki_NLM, wielkosc_extern_sh_memory >> > 

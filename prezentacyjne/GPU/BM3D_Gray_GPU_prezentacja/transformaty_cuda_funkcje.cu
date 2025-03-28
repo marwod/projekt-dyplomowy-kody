@@ -14,13 +14,12 @@ marwod@interia.pl
 #include <math.h>
 #include <cmath>
 #include <cuda_runtime.h>
-#include <conio.h>
 #include <iostream>
 
-#define ROZMIAR_OBSZARU_PRZESZUKANIA       32 //wartoœæ w iloœci ³atek i u¿ywanych w¹tków. rozmiar w pixelax wyniesie 40 (po dodaniu rozmiaru ³atki
+#define ROZMIAR_OBSZARU_PRZESZUKANIA       32 //wartoœc w iloœci latek i uzywanych watkow. rozmiar w pixelax wyniesie 40 (po dodaniu rozmiaru latki
 #define ROZMIAR_LATKI       8
 #define N_WIEN     32
-#define RZECZYWISTY_ROZMIAR_OBSZARU_PRZESZUKANIA 40 // ROZMIAR_PRZESZUKANIA +ROZMIAR_£ATKI iloœæ pixeli obszaru przeszukania
+#define RZECZYWISTY_ROZMIAR_OBSZARU_PRZESZUKANIA 40 // ROZMIAR_PRZESZUKANIA +ROZMIAR_LATKI iloœc pixeli obszaru przeszukania
 #define POWIERZCHNIA_LATKI       64
 
 
@@ -92,7 +91,7 @@ __global__ void DCT(float* Macierz1, float* Macierz2, int x, int y, int* device_
 
             __syncthreads();
 
-            for (int k = 0; k < ROZMIAR_LATKI; k++) // K mniejsze ni¿ rozmir Latki
+            for (int k = 0; k < ROZMIAR_LATKI; k++) // K mniejsze niz rozmir Latki
             {
                 Macierz_wynikowa_1[threadIdx.y * ROZMIAR_LATKI + threadIdx.x] += sz_Const_macierz_wspolczynnikow2d_1[(threadIdx.y * ROZMIAR_LATKI + k)] * Macierz_wejsciowa[k * ROZMIAR_LATKI + threadIdx.x];
 
@@ -120,7 +119,7 @@ __global__ void DCT(float* Macierz1, float* Macierz2, int x, int y, int* device_
 
                 __syncthreads();
 
-                for (int k = 0; k < ROZMIAR_LATKI; k++) // K mniejsze ni¿ rozmir Latki
+                for (int k = 0; k < ROZMIAR_LATKI; k++) // K mniejsze niz rozmir Latki
                 {
                     Macierz_wynikowa_1[threadIdx.y * ROZMIAR_LATKI + threadIdx.x] += sz_Const_macierz_wspolczynnikow2d_1[threadIdx.y * ROZMIAR_LATKI + k] * Macierz_wejsciowa[k * ROZMIAR_LATKI + threadIdx.x];
 
@@ -182,7 +181,7 @@ __global__ void DCT_odwrotna(float* Macierz, int x, int y, int* device_tablica_i
 
             for (int k = 0; k < ROZMIAR_LATKI; k++)
             {
-                //optymalne, mo¿na pos³ugiwaæ siê tylko jedn¹ macierz¹ wspó³czynników za³adowan¹ do shared memoery
+                //optymalne, mozna poslugiwac sie tylko jedna macierza wspolczynnikow zaladowana do shared memoery
                 Macierz_wynikowa_1[threadIdx.y + threadIdx.x * ROZMIAR_LATKI] += sz_Const_macierz_wspolczynnikow2d_1[(k * ROZMIAR_LATKI + threadIdx.y)] * Macierz_wejsciowa[k * ROZMIAR_LATKI + threadIdx.x];
 
             }
@@ -218,7 +217,7 @@ __global__ void Walsh1dPojedyncza(float* macierz1, float* macierz2, int* device_
     if (device_tablica_ilosci_pasujacych_latek[blockIdx.z] > 1)
     {
 
-        __shared__  float macierz_s[POWIERZCHNIA_LATKI * N_WIEN];//macie¿ w shared memory pozwalaj¹ca za³adowaæ maksymalne 32 ³atki 8 na 8
+        __shared__  float macierz_s[POWIERZCHNIA_LATKI * N_WIEN];//maciez w shared memory pozwalajaca zaladowac maksymalne 32 latki 8 na 8
         for (int i = 0; i < 2; i++)
         {
             macierz_s[indeks2d + (ROZMIAR_LATKI * ROZMIAR_LATKI * ilosc_pasujacych_latek / 2 * i)] = macierz1[przesuniecie + indeks2d + (ROZMIAR_LATKI * ROZMIAR_LATKI * ilosc_pasujacych_latek / 2 * i)];

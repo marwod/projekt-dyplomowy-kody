@@ -9,7 +9,6 @@ marwod@interia.pl
 #include <string>
 #include <iostream>
 #include <cmath>
-#include <conio.h>
 #include <math.h>
 #include <cmath>
 #include<vector>
@@ -24,7 +23,7 @@ using namespace cv;
 
 
 //******************************************************************************************************************
-///////////////////////////////FUNKCJE OGÓLNE////////////////////////////////////////////////
+///////////////////////////////FUNKCJE OGoLNE////////////////////////////////////////////////
 
 
 inline float ObliczanieMSE_Gray(cv::Mat referencyjna, cv::Mat porownywana, int wielkosc_okienka, float** tablica_rozkladu_gaussa)
@@ -168,11 +167,11 @@ inline void NLM_Kolor(cv::Mat Okno_Przeszukania, cv::Mat Okienko_Referencyjne,
 void dodanie_szumu(cv::Mat obrazek_zaszumiony, double sigm, int ilosc_kanalow)
 {
 
-	double sigma = sigm; // Wartość sigma dla szumu gaussowskiego
+	double sigma = sigm; // Wartosc sigma dla szumu gaussowskiego
 	// Generator liczb losowych dla szumu gaussowskiego
 	std::default_random_engine generator;
 	std::normal_distribution<double> distribution(0.0, sigma);
-	// Dodaje szum gaussowski do każdego piksela
+	// Dodaje szum gaussowski do kazdego piksela
 	for (int y = 0; y < obrazek_zaszumiony.rows; y++)
 	{
 		for (int x = 0; x < obrazek_zaszumiony.cols; x++)
@@ -229,43 +228,43 @@ float Generacja_K_z(float x, float y, float a, float polowa_latki)
 int main(int argv, char* argc)
 {
 
-	int kolor_obrazka = 1; // zawiera informację czy przetwarzany obraz będzie w skali szarości czy kolorze
-	int opcja_obrazka; // zawiera informację czy przetwarzany obraz jest już zaszumiiony czy dodać szum
+	int kolor_obrazka = 1; // zawiera informację czy przetwarzany obraz będzie w skali szarosci czy kolorze
+	int opcja_obrazka; // zawiera informację czy przetwarzany obraz jest juz zaszumiiony czy dodac szum
 	float sigma; // poziom szumu
-	float stala_h; // parametr określany przed procesem odszumiania w zależnosci od szumu i wielkosci  Okienka referncyjnego, uzywany w procesie obiczania wagi piksela
-	bool Froment = true; // czy stosować obliczenie K zfgodnie z propozycją z artykulu Fromenta;
-	bool Bodues = false; //czy odejmować 2*sigma*sigma od obliczoej odlegości pomiędzy pikselami
-	cv::Mat Obrazek; // obiekt opencv Mat w którym będzie zapisany przetwarzany obrazek
-	cv::Mat ObrazekReferencyjny; //obiekt opencv Mat w którym będzie wczytany obrazek bez szumu
-	cv::Mat NLM_OpenC;// obekt opencv Mat w którym będzie zapisany obrazek odszumiony funkcją NLM z bibliotek opencv
-	cv::Mat MacierzWyjsciowa; // obiekt opencv Mat w którym będzie zapisane piksele po odszumieniu
-	cv::Mat Okno_Przeszukania; //obiekt opencv Mat który będzie stanowił "wskaznik" na obszar obrazka uwzględniany przy obliczaniu piksela odszumionego
-	cv::Mat Okienko_Referencyjne; //obiekt opencv Mat który będzie stanowił "wskaznik" na obszar obrazka uwzględniany przy obliczaniu podobienstwa między dwoam pikselami
+	float stala_h; // parametr okreslany przed procesem odszumiania w zaleznosci od szumu i wielkosci  Okienka referncyjnego, uzywany w procesie obiczania wagi piksela
+	bool Froment = true; // czy stosowac obliczenie K zfgodnie z propozycją z artykulu Fromenta;
+	bool Bodues = false; //czy odejmowac 2*sigma*sigma od obliczoej odlegosci pomiędzy pikselami
+	cv::Mat Obrazek; // obiekt opencv Mat w ktorym będzie zapisany przetwarzany obrazek
+	cv::Mat ObrazekReferencyjny; //obiekt opencv Mat w ktorym będzie wczytany obrazek bez szumu
+	cv::Mat NLM_OpenC;// obekt opencv Mat w ktorym będzie zapisany obrazek odszumiony funkcją NLM z bibliotek opencv
+	cv::Mat MacierzWyjsciowa; // obiekt opencv Mat w ktorym będzie zapisane piksele po odszumieniu
+	cv::Mat Okno_Przeszukania; //obiekt opencv Mat ktory będzie stanowil "wskaznik" na obszar obrazka uwzględniany przy obliczaniu piksela odszumionego
+	cv::Mat Okienko_Referencyjne; //obiekt opencv Mat ktory będzie stanowil "wskaznik" na obszar obrazka uwzględniany przy obliczaniu podobienstwa między dwoam pikselami
 	std::string nazwa_pilku_zaszumionego; //nazwa wczytywanego pliku wraz z rozszerzeniem, bez sciezki;
 	std::string nazwa_pilku_referencyjnego; //nazwa wczytywanego pliku wraz z rozszerzeniem, bez sciezki;
 	std::string nazwa_sciezki = "obrazki_testowe/";// nazwa sciezki wzglednej do pliku w folderze "obrazki_testowe"
-	int orginal_obrazek_width; // szerokosc obrazka orginalnego, bez dodanych marginesów
-	int orginal_obrazek_height; // wysokosc obrazka orginalnego, bez dodanych marginesów
+	int orginal_obrazek_width; // szerokosc obrazka orginalnego, bez dodanych marginesow
+	int orginal_obrazek_height; // wysokosc obrazka orginalnego, bez dodanych marginesow
 	int wielkosc_okna_podobienstwa; // wielkosc obszaru obrazka uwzględniany przy obliczaniu podobienstwa między dwoma pikselami
 	int wielkosc_okna_przeszukania; //wielkosc obsaru obrazka uwzględnianego przy obliczaniu piksela odszumionego, 21 alblo 35 pixeli
-	int polowa_okna_przeszukania; //długośc obszaru pomiędzy pikselem odszymianym a granicą okna, (wielkosc_okna_przeszukania-1)/2 
-	int polowa_okna_podobienstwa; //długośc obszaru pomiędzy pikselem odszymianym a granicą okna, (wielkosc_okna_podobienstwa-1)/2
-	int rzeczywiste_okno_przeszukania; //wielkość okna podobienstwa poszerzonegopo obu stronach o połowy okna przeszukania
-	int polowa_rzeczywistego_okna_przeszukania;// długośc obszaru pomiędzy pikselem odszymianym a granicą okna, (rzeczywiste_okna_przeszukania - 1) / 2
-	int wielkosc_marginesu;// margines dodawany do obrazka z lewej strony i od góry w celu odszumienia pikseli przy brzegach obrazka 
-	//int wielkosc_marginesu_prawego;// margines dodawany do obrazka z prawej strony i od dołu w celu odszumienia pikseli przy brzegach obrazka 
-	int obrazek_z_marginesami_width;// szerokosc obrazka po dodaniu marginesów
-	int obrazek_z_marginesami_height; // wysokość pobrazka po dodaniu marginesów
-	double poziom_rozmycia_gauss; // poziom rozmycia fitrem gaussa (w przypadku zastosowania prefiltracji) zależny od poziomu szumu
-	float redukcja_sigmy; // współczynnik redukcji wspłczynnika szumu podczas dalszego przetwarzania, po zastosowaniu prefiltracjii gaussem
-	float wartosc_pixela_odszumionego;// tymczasowe miejsce zapisu wartości odszumionego piksela w obrazku szarym
-	Vec3f wartosc_pixela_odszumionego_kolor; // tymczasowe miejsce zapisu wartości odszumionego piksela w obrazku kolorowym
+	int polowa_okna_przeszukania; //dlugosc obszaru pomiędzy pikselem odszymianym a granicą okna, (wielkosc_okna_przeszukania-1)/2 
+	int polowa_okna_podobienstwa; //dlugosc obszaru pomiędzy pikselem odszymianym a granicą okna, (wielkosc_okna_podobienstwa-1)/2
+	int rzeczywiste_okno_przeszukania; //wielkosc okna podobienstwa poszerzonegopo obu stronach o polowy okna przeszukania
+	int polowa_rzeczywistego_okna_przeszukania;// dlugosc obszaru pomiędzy pikselem odszymianym a granicą okna, (rzeczywiste_okna_przeszukania - 1) / 2
+	int wielkosc_marginesu;// margines dodawany do obrazka z lewej strony i od gory w celu odszumienia pikseli przy brzegach obrazka 
+	//int wielkosc_marginesu_prawego;// margines dodawany do obrazka z prawej strony i od dolu w celu odszumienia pikseli przy brzegach obrazka 
+	int obrazek_z_marginesami_width;// szerokosc obrazka po dodaniu marginesow
+	int obrazek_z_marginesami_height; // wysokosc pobrazka po dodaniu marginesow
+	double poziom_rozmycia_gauss; // poziom rozmycia fitrem gaussa (w przypadku zastosowania prefiltracji) zalezny od poziomu szumu
+	float redukcja_sigmy; // wspolczynnik redukcji wsplczynnika szumu podczas dalszego przetwarzania, po zastosowaniu prefiltracjii gaussem
+	float wartosc_pixela_odszumionego;// tymczasowe miejsce zapisu wartosci odszumionego piksela w obrazku szarym
+	Vec3f wartosc_pixela_odszumionego_kolor; // tymczasowe miejsce zapisu wartosci odszumionego piksela w obrazku kolorowym
 
 
 
 	do
 	{
-		std::cout << "Obrazek w skali szarości czy kolowowy" << std::endl;
+		std::cout << "Obrazek w skali szarosci czy kolowowy" << std::endl;
 		std::cout << "1) skala szarosci" << std::endl;
 		std::cout << "2) kolorowy" << std::endl;
 		std::cin >> kolor_obrazka;
@@ -418,7 +417,7 @@ int main(int argv, char* argc)
 
 	cv::fastNlMeansDenoising(Obrazek, NLM_OpenC, sigma, wielkosc_okna_podobienstwa, wielkosc_okna_przeszukania);
 
-		////////////////dodajemy "marginesy" do obrazka (po połowie obszaru przeszukania -po16)/////////////////////////////
+		////////////////dodajemy "marginesy" do obrazka (po polowie obszaru przeszukania -po16)/////////////////////////////
 
 	polowa_okna_przeszukania = (wielkosc_okna_przeszukania - 1) / 2;
 	polowa_okna_podobienstwa = (wielkosc_okna_podobienstwa - 1) / 2;

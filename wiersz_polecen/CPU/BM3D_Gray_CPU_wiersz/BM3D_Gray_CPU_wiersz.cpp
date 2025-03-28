@@ -9,7 +9,6 @@ marwod@interia.pl
 #include <string>
 #include <iostream>
 #include <cmath>
-#include <conio.h>
 #include <math.h>
 #include <cmath>
 #include<vector>
@@ -26,7 +25,7 @@ using namespace cv;
 
 
 //******************************************************************************************************************
-///////////////////////////////FUNKCJE OGÓLNE////////////////////////////////////////////////
+///////////////////////////////FUNKCJE OGOLNE////////////////////////////////////////////////
 inline int NajbizszawielokrotnoscDw(int n)
 {
 	if ((n && !(n & (n - 1))) == 1)
@@ -40,7 +39,7 @@ inline int NajbizszawielokrotnoscDw(int n)
 	return  n;
 }
 
-inline void dct_1d_2typ(std::vector<cv::Mat>& WektorGrupy3d, int x, int y)//implemtacja użycwająca OPENCV -szybka
+inline void dct_1d_2typ(std::vector<cv::Mat>& WektorGrupy3d, int x, int y)//implemtacja użycwajaca OPENCV -szybka
 {
 	int N = WektorGrupy3d.size();
 	Mat Tymczasowa(1, N, CV_32F);
@@ -724,44 +723,7 @@ void FiltrowanieFiltremWienaWalsh(vector<cv::Mat>& WektorGrupy3d_2krok, vector<c
 }
 
 
-void dodanie_szumu(cv::Mat obrazek_zaszumiony, int sigm, int ilosc_kanalow)
-{
 
-	double sigma = sigm; // Wartość sigma dla szumu gaussowskiego
-
-	// Generator liczb losowych dla szumu gaussowskiego
-	std::default_random_engine generator;
-	std::normal_distribution<double> distribution(0.0, sigma);
-	// Dodaje szum gaussowski do każdego piksela
-	for (int y = 0; y < obrazek_zaszumiony.rows; y++)
-	{
-		for (int x = 0; x < obrazek_zaszumiony.cols; x++)
-		{
-			if (ilosc_kanalow == 1)
-			{
-				cv::Vec<uchar, 1>& pixele = obrazek_zaszumiony.at<cv::Vec<uchar, 1>>(y, x);
-				for (int c = 0; c < 1; c++)
-				{
-					double szum = distribution(generator);
-					int nowa_wartosc = cv::saturate_cast<uchar>(pixele[c] + szum);
-					pixele[c] = nowa_wartosc;
-				}
-			}
-			else
-			{
-				cv::Vec3b& pixele = obrazek_zaszumiony.at<cv::Vec3b>(y, x);
-				for (int c = 0; c < 3; c++)
-				{
-					double szum = distribution(generator);
-					int nowa_wartosc = cv::saturate_cast<uchar>(pixele[c] + szum);
-					pixele[c] = nowa_wartosc;
-				}
-			}
-
-
-		}
-	}
-}
 
 void funkcja_glowna(cv::Mat Obrazek, cv::Mat &MacierzWyjsciowa1krok, cv::Mat &MacierzWyjsciowa2krok, int sigma, int tryb_szybkosci, int transformata, cv::Mat Macierz_Kaisera)
 {
@@ -772,13 +734,13 @@ void funkcja_glowna(cv::Mat Obrazek, cv::Mat &MacierzWyjsciowa1krok, cv::Mat &Ma
 	float LambdaHard3d = 2.7; //LambdaHard3d	progowanie(trasholding) Grupy3d w pierwszym kroku filtra, u Lebruna 2,7
 	int k_Hard = 8; //k_Hard Wielkosc Latki w 1 kroku, dla DTC 8
 	int k_Wien = 8;// Wielkosc Latki w 1 kroku, dla DTC 8
-	int N_Hard = 16;//N_Hard Maksymalna wielkość grupy 3d w 1kroku, dla DCT musi być parzysta, u Lebruna 16
-	int N_Wien = 32; // Maksymalna wielkość grupy 3d w 2kroku, dla DCT musi być parzysta u Lebruna 32
+	int N_Hard = 16;//N_Hard Maksymalna wielkosc grupy 3d w 1kroku, dla DCT musi byc parzysta, u Lebruna 16
+	int N_Wien = 32; // Maksymalna wielkosc grupy 3d w 2kroku, dla DCT musi byc parzysta u Lebruna 32
 	int n_Hard = 38;//n_Hard Wielkosc okna szukania podobych latek w pierwszym kroku
 	int n_Wien = 38; // Wielkosc okna szukania podobych latek w drugim kroku
-	float tau_Hard_niski = 25000;//tau_Hard_niski -maksymalna odleglosc latek przy szumie małym (ponizej 40) - u Lebruna 2500
+	float tau_Hard_niski = 25000;//tau_Hard_niski -maksymalna odleglosc latek przy szumie malym (ponizej 40) - u Lebruna 2500
 	float tau_Hard_wysoki = 15000.0;//tau_Hard_wysoki -maksymalna odleglosc latek przy szumie duzym (powyzej (40) - u Lebruna 5000
-	float tau_Wien_niski = 400;// -maksymalna odleglosc latek przy szumie małym(ponizej 40) - u Lebruna 400
+	float tau_Wien_niski = 400;// -maksymalna odleglosc latek przy szumie malym(ponizej 40) - u Lebruna 400
 	float tau_Wien_wysoki = 1500;// -maksymalna odleglosc latek przy szumie duzym(powyzej(40) - u Lebruna 800
 	cv::Mat ObrazekReferencyjny;
 	cv::Mat** tablica_latek_1;
@@ -835,7 +797,7 @@ void funkcja_glowna(cv::Mat Obrazek, cv::Mat &MacierzWyjsciowa1krok, cv::Mat &Ma
 		tablica_latek_po_1_kroku[i] = new Mat[wysokosc_Tablicy];
 	}
 
-	//Najpierw tworzymy tablice zawierającą łatki pokrywające obrazek i od razu łatki te poddajemy DCT2D//
+	//Najpierw tworzymy tablice zawierajaca latki pokrywajace obrazek i od razu latki te poddajemy DCT2D//
 
 
 	for (int i = 0; i < szerokosc_Tablicy; i++)
@@ -859,7 +821,7 @@ void funkcja_glowna(cv::Mat Obrazek, cv::Mat &MacierzWyjsciowa1krok, cv::Mat &Ma
 		for (int j = 0; j < wysokosc_Tablicy + p_Hard; j += p_Hard)
 
 		{
-			//zabezpieczenie na wypadek gsyny przy p_Hard =3 iteracja przeskaiwała poza ostatnie piksele
+			//zabezpieczenie na wypadek gsyny przy p_Hard =3 iteracja przeskaiwala poza ostatnie piksele
 			int x = i;
 			int y = j;
 			if (i >= szerokosc_Tablicy) x = szerokosc_Tablicy - 1;
@@ -891,7 +853,7 @@ void funkcja_glowna(cv::Mat Obrazek, cv::Mat &MacierzWyjsciowa1krok, cv::Mat &Ma
 		for (int j = 0; j < wysokosc_Tablicy; j++)
 
 		{
-			tablica_latek_po_1_kroku[i][j] = cv::Mat(MacierzWyjsciowa1krok(Rect(i, j, k_Wien, k_Wien)).clone()); // tak powinno być, żeby stworzyć głęboką kopię
+			tablica_latek_po_1_kroku[i][j] = cv::Mat(MacierzWyjsciowa1krok(Rect(i, j, k_Wien, k_Wien)).clone()); // tak powinno byc, żeby stworzyc gleboka kopie
 			cv::dct(tablica_latek_po_1_kroku[i][j], tablica_latek_po_1_kroku[i][j]);
 		}
 	}
@@ -977,10 +939,10 @@ int main(int argc, char* argv[])
 	if (argc == 2 && (std::string(argv[1]) == "--help" || std::string(argv[1]) == "-h")) 
 	{
 		std::cout << "Filtr BM3D CPU, filtruje z szumu obrazy w skali szarosci.\n";
-		std::cout << "Uzycie: BM3D_CPU.exe <nazwa pliku> <liczba całkowita> <liczba zmiennoprzecinkowa> <bool>\n";
+		std::cout << "Uzycie: BM3D_CPU.exe <nazwa pliku> <liczba calkowita> <liczba zmiennoprzecinkowa> <bool>\n";
 		std::cout << "Argumenty:\n";
 		std::cout << "  <nazwa pliku>       Nazwa pliku (string). Mozna podac nazwe i sciezke folderu lub sama nazwe \n";
-		std::cout << "                      jezeli znajduje sie w jednym folderze z programem - zostanąa przetworzone \n";
+		std::cout << "                      jezeli znajduje sie w jednym folderze z programem - zostanaa przetworzone \n";
 		std::cout << "                      wszystkie pliki graficzne w folderze\n";
 		std::cout << "  <poziom szumu>      Liczba calkowita (int)\n";
 		std::cout << "  <tryb szybkosci>	0 - normalny, 1 - szybki\n";
@@ -1049,8 +1011,8 @@ int main(int argc, char* argv[])
                             std::cout << "Utworzono folder: " << nowa_sciezka << std::endl;
                         }
                         else {
-                            std::cerr << "Nie udało się utworzyć folderu: " << nowa_sciezka << std::endl;
-                            return 1; // Zakończenie programu z błędem
+                            std::cerr << "Nie udalo sie utworzyc folderu: " << nowa_sciezka << std::endl;
+                            return 1; // Zakończenie programu z bledem
                         }
                     }
                     cv::imwrite(nowa_nazwa_i_sciezka, MacierzWyjsciowa2krok);
@@ -1061,7 +1023,7 @@ int main(int argc, char* argv[])
 		}
 	}
 	else {
-		std::cerr << "Podana ścieżka lub nazwa pliku  jest bledna" << std::endl;
+		std::cerr << "Podana scieżka lub nazwa pliku  jest bledna" << std::endl;
 		return 1;
 	}
 	time_t czasStop = time(NULL);

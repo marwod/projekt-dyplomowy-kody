@@ -9,7 +9,6 @@ marwod@interia.pl
 #include <string>
 #include <iostream>
 #include <cmath>
-#include <conio.h>
 #include <math.h>
 #include <cmath>
 #include<vector>
@@ -23,7 +22,7 @@ using namespace cv;
 
 
 //******************************************************************************************************************
-///////////////////////////////FUNKCJE OGÓLNE////////////////////////////////////////////////
+///////////////////////////////FUNKCJE OGoLNE////////////////////////////////////////////////
 inline int NajbizszawielokrotnoscDw(int n)
 {
 	if ((n && !(n & (n - 1))) == 1)
@@ -37,7 +36,7 @@ inline int NajbizszawielokrotnoscDw(int n)
 	return  n;
 }
 
-inline void dct_1d_2typ(std::vector<cv::Mat>& WektorGrupy3d, int x, int y)//implemtacja użycwająca OPENCV -szybka
+inline void dct_1d_2typ(std::vector<cv::Mat>& WektorGrupy3d, int x, int y)//implemtacja uzycwajaca OPENCV -szybka
 {
 	int N = WektorGrupy3d.size();
 	Mat Tymczasowa(1, N, CV_32F);
@@ -734,7 +733,7 @@ void FiltrowanieFiltremWienaWalsh(vector<cv::Mat>& WektorGrupy3d_2krok, vector<c
 void dodanie_szumu(cv::Mat obrazek_zaszumiony, int sigm, int ilosc_kanalow)
 {
 
-	double sigma = sigm; // Wartość sigma dla szumu gaussowskiego
+	double sigma = sigm; // Wartosc sigma dla szumu gaussowskiego
 
 	// Generator liczb losowych dla szumu gaussowskiego
 	std::default_random_engine generator;
@@ -790,13 +789,13 @@ int main(int argv, char* argc)
 	float LambdaHard3d = 2.7; //LambdaHard3d	progowanie(trasholding) Grupy3d w pierwszym kroku filtra, u Lebruna 2,7
 	int k_Hard = 8; //k_Hard Wielkosc Latki w 1 kroku, dla DTC 8
 	int k_Wien = 8;// Wielkosc Latki w 1 kroku, dla DTC 8
-	int N_Hard = 16;//N_Hard Maksymalna wielkość grupy 3d w 1kroku, dla DCT musi być parzysta, u Lebruna 16
-	int N_Wien = 32; // Maksymalna wielkość grupy 3d w 2kroku, dla DCT musi być parzysta u Lebruna 32
+	int N_Hard = 16;//N_Hard Maksymalna wielkosc grupy 3d w 1kroku, dla DCT musi byc parzysta, u Lebruna 16
+	int N_Wien = 32; // Maksymalna wielkosc grupy 3d w 2kroku, dla DCT musi byc parzysta u Lebruna 32
 	int n_Hard = 38;//n_Hard Wielkosc okna szukania podobych latek w pierwszym kroku
 	int n_Wien = 38; // Wielkosc okna szukania podobych latek w drugim kroku
-	float tau_Hard_niski = 25000;//tau_Hard_niski -maksymalna odleglosc latek przy szumie małym (ponizej 40) - u Lebruna 2500
+	float tau_Hard_niski = 25000;//tau_Hard_niski -maksymalna odleglosc latek przy szumie malym (ponizej 40) - u Lebruna 2500
 	float tau_Hard_wysoki = 15000.0;//tau_Hard_wysoki -maksymalna odleglosc latek przy szumie duzym (powyzej (40) - u Lebruna 5000
-	float tau_Wien_niski = 400;// -maksymalna odleglosc latek przy szumie małym(ponizej 40) - u Lebruna 400
+	float tau_Wien_niski = 400;// -maksymalna odleglosc latek przy szumie malym(ponizej 40) - u Lebruna 400
 	float tau_Wien_wysoki = 1500;// -maksymalna odleglosc latek przy szumie duzym(powyzej(40) - u Lebruna 800
 	cv::Mat Obrazek;
 	cv::Mat ObrazekReferencyjny;
@@ -885,8 +884,8 @@ int main(int argv, char* argc)
 		dodanie_szumu(Obrazek, sigma, 1);
 	}
 
-	std::cout << " jeśli transformata grupy 1d ma być cosinusowa wciśnij 1" << endl;
-	cout << " jeśli transformata grupy 1d ma być Walsha-Hadamarda wciśnij 2" << endl;
+	std::cout << " jesli transformata grupy 1d ma byc cosinusowa wcisnij 1" << endl;
+	cout << " jesli transformata grupy 1d ma byc Walsha-Hadamarda wcisnij 2" << endl;
 	cin >> transformata;
 	cout << transformata << endl;
 	
@@ -922,7 +921,7 @@ int main(int argv, char* argc)
 		tablica_latek_po_1_kroku[i] = new Mat[wysokosc_Tablicy];
 	}
 
-	//Najpierw tworzymy tablice zawierającą łatki pokrywające obrazek i od razu łatki te poddajemy DCT2D//
+	//Najpierw tworzymy tablice zawierajaca latki pokrywajace obrazek i od razu latki te poddajemy DCT2D//
 
 
 	for (int i = 0; i < szerokosc_Tablicy; i++)
@@ -941,7 +940,7 @@ int main(int argv, char* argc)
 		for (int j = 0; j < wysokosc_Tablicy+p_Hard; j += p_Hard)
 
 		{
-			//zabezpieczenie na wypadek gsyny przy p_Hard =3 iteracja przeskaiwała poza ostatnie piksele
+			//zabezpieczenie na wypadek gsyny przy p_Hard =3 iteracja przeskaiwala poza ostatnie piksele
 			int x = i;  
 			int y = j;
 			if (i >= szerokosc_Tablicy) x = szerokosc_Tablicy - 1;
@@ -973,7 +972,7 @@ int main(int argv, char* argc)
 		for (int j = 0; j < wysokosc_Tablicy; j++)
 
 		{
-			tablica_latek_po_1_kroku[i][j] = cv::Mat(MacierzWyjsciowa1krok(Rect(i, j, k_Wien, k_Wien)).clone()); // tak powinno być, żeby stworzyć głęboką kopię
+			tablica_latek_po_1_kroku[i][j] = cv::Mat(MacierzWyjsciowa1krok(Rect(i, j, k_Wien, k_Wien)).clone()); // tak powinno byc, żeby stworzyc gleboka kopie
 			cv::dct(tablica_latek_po_1_kroku[i][j], tablica_latek_po_1_kroku[i][j]);
 		}
 	}

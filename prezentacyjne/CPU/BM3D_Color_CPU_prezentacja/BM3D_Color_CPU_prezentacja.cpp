@@ -9,7 +9,6 @@ marwod@interia.pl
 #include <string>
 #include <iostream>
 #include <cmath>
-#include <conio.h>
 #include <math.h>
 #include <cmath>
 #include<vector>
@@ -39,7 +38,7 @@ inline int NajbizszawielokrotnoscDw(int n)
 ///////////////////////////////FUNKCJE OGÓLNE////////////////////////////////////////////////
 
 
-inline void dct_1d_2typ(std::vector<cv::Mat>& WektorGrupy3d, int x, int y)//implemtacja użycwająca OPENCV -szybka
+inline void dct_1d_2typ(std::vector<cv::Mat>& WektorGrupy3d, int x, int y)//implemtacja uzycwajaca OPENCV -szybka
 {
 	int N = WektorGrupy3d.size();
 	Mat Tymczasowa(1, N, CV_32F);
@@ -120,12 +119,12 @@ inline void walsh_hadamard(std::vector<cv::Mat>& WektorGrupy3d, int x, int y)
 void dodanie_szumu(cv::Mat obrazek_zaszumiony, int sigm, int ilosc_kanalow)
 {
 
-	double sigma = sigm; // Wartość sigma dla szumu gaussowskiego
+	double sigma = sigm; // Wartosc sigma dla szumu gaussowskiego
 
 	// Generator liczb losowych dla szumu gaussowskiego
 	std::default_random_engine generator;
 	std::normal_distribution<double> distribution(0.0, sigma);
-	// Dodaje szum gaussowski do każdego piksela
+	// Dodaje szum gaussowski do kazdego piksela
 	for (int y = 0; y < obrazek_zaszumiony.rows; y++)
 	{
 		for (int x = 0; x < obrazek_zaszumiony.cols; x++)
@@ -320,7 +319,7 @@ inline float ObliczanieMSE_szumMaly(cv::Mat referencyjna, cv::Mat porownywana, i
 }
 
 
-inline float ObliczanieMSE_szumMalyAlternatywa1(cv::Mat referencyjna, cv::Mat porownywana, int latka)//wolniej niż Alternatywa 3
+inline float ObliczanieMSE_szumMalyAlternatywa1(cv::Mat referencyjna, cv::Mat porownywana, int latka)//wolniej niz Alternatywa 3
 {
 	float suma = 0;
 	Mat referencyjna2 = referencyjna - porownywana;
@@ -971,13 +970,13 @@ int main(int argv, char* argc)
 	float LambdaHard3d = 2.7; //LambdaHard3d	progowanie(trasholding) Grupy3d w pierwszym kroku filtra, u Lebruna 2,7
 	int k_Hard = 8; //k_Hard Wielkosc Latki w 1 kroku, dla DTC 8
 	int k_Wien = 8;// Wielkosc Latki w 1 kroku, dla DTC 8
-	int N_Hard = 16;//N_Hard Maksymalna wielkość grupy 3d w 1kroku, dla DCT musi być parzysta, u Lebruna 16
-	int N_Wien = 32; // Maksymalna wielkość grupy 3d w 2kroku, dla DCT musi być parzysta u Lebruna 32
+	int N_Hard = 16;//N_Hard Maksymalna wielkosc grupy 3d w 1kroku, dla DCT musi byc parzysta, u Lebruna 16
+	int N_Wien = 32; // Maksymalna wielkosc grupy 3d w 2kroku, dla DCT musi byc parzysta u Lebruna 32
 	int n_Hard = 39;//n_Hard Wielkosc okna szukania podobych latek w pierwszym kroku
 	int n_Wien = 39; // Wielkosc okna szukania podobych latek w drugim kroku
-	float tau_Hard_niski = 2500;//tau_Hard_niski -maksymalna odleglosc latek przy szumie małym (ponizej 40) - u Lebruna 2500
+	float tau_Hard_niski = 2500;//tau_Hard_niski -maksymalna odleglosc latek przy szumie malym (ponizej 40) - u Lebruna 2500
 	float tau_Hard_wysoki = 10000.0;//tau_Hard_wysoki -maksymalna odleglosc latek przy szumie duzym (powyzej (40) - u Lebruna 5000
-	float tau_Wien_niski = 800;// -maksymalna odleglosc latek przy szumie małym(ponizej 40) - u Lebruna 400
+	float tau_Wien_niski = 800;// -maksymalna odleglosc latek przy szumie malym(ponizej 40) - u Lebruna 400
 	float tau_Wien_wysoki = 1500;// -maksymalna odleglosc latek przy szumie duzym(powyzej(40) - u Lebruna 800
 	cv::Mat Obrazek;
 	cv::Mat ObrazekReferencyjny;
@@ -1059,8 +1058,8 @@ int main(int argv, char* argc)
 		Obrazek = ObrazekReferencyjny.clone(); // Skopiuj obraz do macierzy z szumem
 		dodanie_szumu(Obrazek, sigma, 3);
 	}
-	std::cout << " jeśli transformata grupy 1d ma być cosinusowa wcisnij 1" << endl;
-	std::cout << " jeśli transformata grupy 1d ma być Walsha-Hadamarda wcisnij 2" << endl;
+	std::cout << " jesli transformata grupy 1d ma byc cosinusowa wcisnij 1" << endl;
+	std::cout << " jesli transformata grupy 1d ma byc Walsha-Hadamarda wcisnij 2" << endl;
 	std::cin >> transformata;
 	if (sigma == 0) sigma = 1;
 	time_t czasStart = time(NULL);
@@ -1090,7 +1089,7 @@ int main(int argv, char* argc)
 	WektorGrupy3d_1krok.reserve(16);
 	bool szumDuzy = false;
 	if (sigmaKanaly[0] > 40) szumDuzy = true;
-	//Najpierw tworzymy tablice zawierającą łatki pokrywające obrazek i od razu łatki te poddajemy DCT2D//
+	//Najpierw tworzymy tablice zawierajaca latki pokrywajace obrazek i od razu latki te poddajemy DCT2D//
 	int szerokosc_Tablicy = Obrazek.cols - k_Hard + 1;
 	int wysokosc_Tablicy = Obrazek.rows - k_Hard + 1;
 	cv::Mat** tablica_referencyjna1 = new Mat * [szerokosc_Tablicy]; //alokacja pamieci
@@ -1110,7 +1109,7 @@ int main(int argv, char* argc)
 		for (int j = 0; j < wysokosc_Tablicy; j++)
 
 		{
-			tablica_referencyjna1[i][j] = cv::Mat(ObrazekKolorowy(Rect(i, j, k_Hard, k_Hard)).clone()); // tak powinno być, żeby stworzyć głęboką kopię
+			tablica_referencyjna1[i][j] = cv::Mat(ObrazekKolorowy(Rect(i, j, k_Hard, k_Hard)).clone()); // tak powinno byc, zeby stworzyc gleboka kopie
 			Mat kanaly_1[3];
 			split(tablica_referencyjna1[i][j], kanaly_1);
 
@@ -1191,7 +1190,7 @@ int main(int argv, char* argc)
 		for (int j = 0; j < wysokosc_Tablicy; j++)
 
 		{
-			TablicaWyjscpo1Kroku[i][j] = cv::Mat(MacierzWyjsciowa1krok(Rect(i, j, k_Wien, k_Wien)).clone()); // tak powinno być, żeby stworzyć głęboką kopię
+			TablicaWyjscpo1Kroku[i][j] = cv::Mat(MacierzWyjsciowa1krok(Rect(i, j, k_Wien, k_Wien)).clone()); // tak powinno byc, zeby stworzyc gleboka kopie
 			Mat kanaly_1[3];
 			split(TablicaWyjscpo1Kroku[i][j], kanaly_1);
 			cv::dct(kanaly_1[0], kanaly_1[0]);

@@ -12,7 +12,6 @@ marwod@interia.pl
 #include <time.h>
 #include <iostream>
 #include <cmath>
-#include <conio.h>
 #include <math.h>
 #include <cmath>
 #include<vector>
@@ -26,18 +25,18 @@ marwod@interia.pl
 
 
 
-#define ROZMIAR_OBSZARU_PRZESZUKANIA       32 //wartoœæ w iloœci ³atek i u¿ywanych w¹tków. rozmiar w pixelax wyniesie 40 (po dodaniu rozmiaru ³atki
+#define ROZMIAR_OBSZARU_PRZESZUKANIA       32 //wartosc w ilosci latek i uzywanych watk0w. rozmiar w pixelax wyniesie 40 (po dodaniu rozmiaru latki
 #define ROZMIAR_LATKI       8
 #define POWIERZCHNIA_LATKI       64
-#define RZECZYWISTY_ROZMIAR_OBSZARU_PRZESZUKANIA 40 // ROZMIAR_PRZESZUKANIA +ROZMIAR_£ATKI iloœæ pixeli obszaru przeszukania
+#define RZECZYWISTY_ROZMIAR_OBSZARU_PRZESZUKANIA 40 // ROZMIAR_PRZESZUKANIA +ROZMIAR_lATKI ilosc pixeli obszaru przeszukania
 #define SIGMA       60.0f
 #define LAMBDA2DHARD       0.9f
 #define P_HARD  3 //p_Hard krok tworzenia latek, w oryginale 1,2 lub 3, u Lebruna 3
 #define P_WIEN  3 //krok tworzenia latek, w oryginale 1, 2 lub 3, u Lebruna 3
 #define N_HARD  16 //maks ilosc lek w grupie 3D
 #define N_WIEN  32//maks ilosc lek w grupie 3D
-#define TAU_HARD_NISKI 2500.0 //maksymalna odlegloœc MSE latki przysz szumie niskim
-#define TAU_HARD_WYSOKI 5000.0 //maksymalna odlegloœc MSE latki przysz szumie niskim
+#define TAU_HARD_NISKI 2500.0 //maksymalna odleglosc MSE latki przysz szumie niskim
+#define TAU_HARD_WYSOKI 5000.0 //maksymalna odleglosc MSE latki przysz szumie niskim
 #define LAMBDA3D_HARD 2.7  //LambdaHard2d	progowanie(trasholding) Grupy3d w pierwszym kroku filtra, u Lebruna 2,7
 #define LAMBDA2D_HARD 0.5//Lambda_hard3d progowanie(trasholding) przy block matchingu, u Lebruna 2.0
 
@@ -90,10 +89,10 @@ __constant__ float testowa[64] =
 
 
 __global__ void Najmniejsze_liczby_(Tablice_koordynatLatek koordynatySOA, int* device_tablica_ilosci_pasujacych_latek, int ilosc_najmniejszych, float tau, bool krok2)
-// wykorzystanie algorytmu redykcji u¿ywanego zwykle do sumowania tablicy
+// wykorzystanie algorytmu redykcji uzywanego zwykle do sumowania tablicy
 {
     int przesuniecie = blockIdx.z * ROZMIAR_OBSZARU_PRZESZUKANIA * ROZMIAR_OBSZARU_PRZESZUKANIA;
-    __shared__ int s_tablica_indeksów_poczatkowych[1024];
+    __shared__ int s_tablica_indeks0w_poczatkowych[1024];
     __shared__ float s_tablica_wartosci_MSE[1024];
     __shared__ int s_koordynaty_najmniejszych_SOA[N_WIEN];
     for (int i = 0; i < 2; i++)
@@ -101,7 +100,7 @@ __global__ void Najmniejsze_liczby_(Tablice_koordynatLatek koordynatySOA, int* d
         if (threadIdx.x < 512)
         {
             s_tablica_wartosci_MSE[threadIdx.x + (i * 512)] = koordynatySOA.MSE[przesuniecie + threadIdx.x + (i * 512)];
-            s_tablica_indeksów_poczatkowych[threadIdx.x + (i * 512)] = threadIdx.x + (i * 512);
+            s_tablica_indeks0w_poczatkowych[threadIdx.x + (i * 512)] = threadIdx.x + (i * 512);
         }
     }
     __syncthreads();
@@ -109,14 +108,14 @@ __global__ void Najmniejsze_liczby_(Tablice_koordynatLatek koordynatySOA, int* d
 
     for (int i = 0; i < ilosc_najmniejszych; i++)
     {
-        for (int s = (ROZMIAR_OBSZARU_PRZESZUKANIA * ROZMIAR_OBSZARU_PRZESZUKANIA / 2); s > 0; s >>= 1)//s zmniejszamy dwukrotnie za ka¿d¹ iteracj¹
+        for (int s = (ROZMIAR_OBSZARU_PRZESZUKANIA * ROZMIAR_OBSZARU_PRZESZUKANIA / 2); s > 0; s >>= 1)//s zmniejszamy dwukrotnie za kazda iteracja
         {
 
             if ((threadIdx.x < s))
             {
-                if (s_tablica_wartosci_MSE[s_tablica_indeksów_poczatkowych[threadIdx.x]] > s_tablica_wartosci_MSE[s_tablica_indeksów_poczatkowych[threadIdx.x + s]])
+                if (s_tablica_wartosci_MSE[s_tablica_indeks0w_poczatkowych[threadIdx.x]] > s_tablica_wartosci_MSE[s_tablica_indeks0w_poczatkowych[threadIdx.x + s]])
                 {
-                    s_tablica_indeksów_poczatkowych[threadIdx.x] = s_tablica_indeksów_poczatkowych[threadIdx.x + s];
+                    s_tablica_indeks0w_poczatkowych[threadIdx.x] = s_tablica_indeks0w_poczatkowych[threadIdx.x + s];
                 }
             }
         }
@@ -124,8 +123,8 @@ __global__ void Najmniejsze_liczby_(Tablice_koordynatLatek koordynatySOA, int* d
 
         if (threadIdx.x == 0)
         {
-            s_koordynaty_najmniejszych_SOA[i] = s_tablica_indeksów_poczatkowych[0];
-            s_tablica_wartosci_MSE[s_tablica_indeksów_poczatkowych[0]] = 10000000000000000000;
+            s_koordynaty_najmniejszych_SOA[i] = s_tablica_indeks0w_poczatkowych[0];
+            s_tablica_wartosci_MSE[s_tablica_indeks0w_poczatkowych[0]] = 10000000000000000000;
         }
     }
     __syncthreads();
@@ -303,7 +302,7 @@ __global__ void Kalkulator_MSE_szum_duzy(float* __restrict__ Obrazek, Tablice_ko
         if (threadIdx.x == 0 && threadIdx.y == 0)
         {
             float suma = 0;
-            for (int i = 0; i < ROZMIAR_LATKI * ROZMIAR_LATKI; i++)//atomic add dla floatów jest wolniejsze
+            for (int i = 0; i < ROZMIAR_LATKI * ROZMIAR_LATKI; i++)//atomic add dla float0w jest wolniejsze
             {
                 suma = suma + latka_referencyjna[i];
             }
@@ -357,7 +356,7 @@ __global__ void Przepisywacz_do_tablic_transformaty_(Obrazek_YCrCb obrazek_przep
     }
     __syncthreads();
 
-    /////////////////////////////Kana³ G:
+    /////////////////////////////Kanal G:
     if ((row_pos < RZECZYWISTY_ROZMIAR_OBSZARU_PRZESZUKANIA / 5) && (col_pos < RZECZYWISTY_ROZMIAR_OBSZARU_PRZESZUKANIA / 5))
     {
         for (int i = 0; i < 5; i++)
@@ -365,7 +364,7 @@ __global__ void Przepisywacz_do_tablic_transformaty_(Obrazek_YCrCb obrazek_przep
             for (int j = 0; j < 5; j++)
             {
                 obszar_preszukana_shared[(row_pos + i * offset) * (RZECZYWISTY_ROZMIAR_OBSZARU_PRZESZUKANIA)+col_pos + (j * offset)] = obrazek_przepisywany.kanal_Cr[((row_pos + i * offset) + index_y_pixela_gorny_lewy_obszaru_przeszukania) * szerokosc + col_pos + (j * offset) + index_x_pixela_gorny_lewy_obszaru_przeszukania];
-                //przpisujemy obszar preszukania (40 pixeli) dla ³atki do pamiêci dzielonej bloku, ze wzglêdu na zmieszczenie siê w dostêpnej w wywo³aniu funkcji iosci w¹tków musia³em zrealizowaæ przypisanie w czterech krokach.
+                //przpisujemy obszar preszukania (40 pixeli) dla latki do pamieci dzielonej bloku, ze wzgledu na zmieszczenie sie w dostepnej w wywolaniu funkcji iosci watk0w musialem zrealizowac przypisanie w czterech krokach.
             }
         }
     }
@@ -373,7 +372,7 @@ __global__ void Przepisywacz_do_tablic_transformaty_(Obrazek_YCrCb obrazek_przep
 
     if ((row_pos < ROZMIAR_LATKI) && (col_pos < ROZMIAR_LATKI))
     {
-        for (int i = 0; i < tablica_ilosci_pasujacych_latek[blockIdx.z]; i++)//³atka po ³atce przepsisujemy ³atki z obszaru przeszukania do tablicy transformat device_tablice_transformaty_32_1krok(dla 1 kroku, dl 2 kroku device_tablice_transformaty_32_
+        for (int i = 0; i < tablica_ilosci_pasujacych_latek[blockIdx.z]; i++)//latka po latce przepsisujemy latki z obszaru przeszukania do tablicy transformat device_tablice_transformaty_32_1krok(dla 1 kroku, dl 2 kroku device_tablice_transformaty_32_
         {
             {
                 indeks_pomocniczy1 = col_pos + row_pos * ROZMIAR_LATKI + (i * ROZMIAR_LATKI * ROZMIAR_LATKI);
@@ -382,7 +381,7 @@ __global__ void Przepisywacz_do_tablic_transformaty_(Obrazek_YCrCb obrazek_przep
             }
         }
     }
-    //////////////////////////////Kana³ B
+    //////////////////////////////Kanal B
     if ((row_pos < RZECZYWISTY_ROZMIAR_OBSZARU_PRZESZUKANIA / 5) && (col_pos < RZECZYWISTY_ROZMIAR_OBSZARU_PRZESZUKANIA / 5))
     {
         for (int i = 0; i < 5; i++)
@@ -390,7 +389,7 @@ __global__ void Przepisywacz_do_tablic_transformaty_(Obrazek_YCrCb obrazek_przep
             for (int j = 0; j < 5; j++)
             {
                 obszar_preszukana_shared[(row_pos + i * offset) * (RZECZYWISTY_ROZMIAR_OBSZARU_PRZESZUKANIA)+col_pos + (j * offset)] = obrazek_przepisywany.kanal_Cb[((row_pos + i * offset) + index_y_pixela_gorny_lewy_obszaru_przeszukania) * szerokosc + col_pos + (j * offset) + index_x_pixela_gorny_lewy_obszaru_przeszukania];
-                //przpisujemy obszar preszukania (40 pixeli) dla ³atki do pamiêci dzielonej bloku, ze wzglêdu na zmieszczenie siê w dostêpnej w wywo³aniu funkcji iosci w¹tków musia³em zrealizowaæ przypisanie w czterech krokach.
+                //przpisujemy obszar preszukania (40 pixeli) dla latki do pamieci dzielonej bloku, ze wzgledu na zmieszczenie sie w dostepnej w wywolaniu funkcji iosci watk0w musialem zrealizowac przypisanie w czterech krokach.
             }
         }
     }
@@ -398,7 +397,7 @@ __global__ void Przepisywacz_do_tablic_transformaty_(Obrazek_YCrCb obrazek_przep
 
     if ((row_pos < ROZMIAR_LATKI) && (col_pos < ROZMIAR_LATKI))
     {
-        for (int i = 0; i < tablica_ilosci_pasujacych_latek[blockIdx.z]; i++)//³atka po ³atce przepsisujemy ³atki z obszaru przeszukania do tablicy transformat device_tablice_transformaty_32_1krok(dla 1 kroku, dl 2 kroku device_tablice_transformaty_32_
+        for (int i = 0; i < tablica_ilosci_pasujacych_latek[blockIdx.z]; i++)//latka po latce przepsisujemy latki z obszaru przeszukania do tablicy transformat device_tablice_transformaty_32_1krok(dla 1 kroku, dl 2 kroku device_tablice_transformaty_32_
         {
             {
                 int indeks_pomocniczy1 = col_pos + (row_pos)*ROZMIAR_LATKI + (i * ROZMIAR_LATKI * ROZMIAR_LATKI);
@@ -418,7 +417,7 @@ __global__ void Przepisywacz_z_tablic_transformaty_1krok_(Tablice_ilosci tablica
 {
     int row_pos = threadIdx.y;
     int col_pos = threadIdx.x;
-    int index_x_pixela_gorny_lewy_obszaru_przeszukania = (blockIdx.z % ilosc_blokow_w_boku_x) * RZECZYWISTY_ROZMIAR_OBSZARU_PRZESZUKANIA + i;//przetestowaæ czy blo z czy y czy jeden i drugi!!!!!!!
+    int index_x_pixela_gorny_lewy_obszaru_przeszukania = (blockIdx.z % ilosc_blokow_w_boku_x) * RZECZYWISTY_ROZMIAR_OBSZARU_PRZESZUKANIA + i;//przetestowac czy blo z czy y czy jeden i drugi!!!!!!!
     int index_y_pixela_gorny_lewy_obszaru_przeszukania = (blockIdx.z / ilosc_blokow_w_boku_x) * RZECZYWISTY_ROZMIAR_OBSZARU_PRZESZUKANIA + j;
     int index_2d_latki = col_pos + (row_pos * ROZMIAR_LATKI);
     int index_elmentu_zero_tablicy_koordynat = (blockIdx.z * ROZMIAR_OBSZARU_PRZESZUKANIA * ROZMIAR_OBSZARU_PRZESZUKANIA);
@@ -448,7 +447,7 @@ __global__ void Przepisywacz_z_tablic_transformaty_1krok_(Tablice_ilosci tablica
             __syncthreads();
         }
         //__syncthreads();
-        for (int i = 0; i < device_tablica_ilosci_pasujacych_latek[blockIdx.z]; i++)//³atka po ³atce przepsisujemy ³atki z  tablicy transformat device_tablice_transformaty_32_1krok(dla 1 kroku, dl 2 kroku device_tablice_transformaty_32 do t
+        for (int i = 0; i < device_tablica_ilosci_pasujacych_latek[blockIdx.z]; i++)//latka po latce przepsisujemy latki z  tablicy transformat device_tablice_transformaty_32_1krok(dla 1 kroku, dl 2 kroku device_tablice_transformaty_32 do t
         {
 
             indeks_pomocniczy1_odkladanie_latek = index_2d_latki + index_elmentu_zero_tablicy_transformat + (i * ROZMIAR_LATKI * ROZMIAR_LATKI);
@@ -460,7 +459,7 @@ __global__ void Przepisywacz_z_tablic_transformaty_1krok_(Tablice_ilosci tablica
         }
 
 
-        for (int i = 0; i < device_tablica_ilosci_pasujacych_latek[blockIdx.z]; i++)//³atka po ³atce przepsisujemy ³atki z  tablicy transformat device_tablice_transformaty_32_1krok(dla 1 kroku, dl 2 kroku device_tablice_transformaty_32 do t
+        for (int i = 0; i < device_tablica_ilosci_pasujacych_latek[blockIdx.z]; i++)//latka po latce przepsisujemy latki z  tablicy transformat device_tablice_transformaty_32_1krok(dla 1 kroku, dl 2 kroku device_tablice_transformaty_32 do t
         {
 
             indeks_pomocniczy1_odkladanie_latek = index_2d_latki + index_elmentu_zero_tablicy_transformat + (i * ROZMIAR_LATKI * ROZMIAR_LATKI);
@@ -483,7 +482,7 @@ __global__ void Przepisywacz_z_tablic_transformaty_2krok_
 {
     int row_pos = threadIdx.y;
     int col_pos = threadIdx.x;
-    int index_x_pixela_gorny_lewy_obszaru_przeszukania = (blockIdx.z % ilosc_blokow_w_boku_x) * RZECZYWISTY_ROZMIAR_OBSZARU_PRZESZUKANIA + i;//przetestowaæ czy blo z czy y czy jeden i drugi!!!!!!!
+    int index_x_pixela_gorny_lewy_obszaru_przeszukania = (blockIdx.z % ilosc_blokow_w_boku_x) * RZECZYWISTY_ROZMIAR_OBSZARU_PRZESZUKANIA + i;//przetestowac czy blo z czy y czy jeden i drugi!!!!!!!
     int index_y_pixela_gorny_lewy_obszaru_przeszukania = (blockIdx.z / ilosc_blokow_w_boku_x) * RZECZYWISTY_ROZMIAR_OBSZARU_PRZESZUKANIA + j;
     int index_2d_latki = col_pos + (row_pos * ROZMIAR_LATKI);
     int index_elmentu_zero_tablicy_koordynat = (blockIdx.z * ROZMIAR_OBSZARU_PRZESZUKANIA * ROZMIAR_OBSZARU_PRZESZUKANIA);
@@ -494,7 +493,7 @@ __global__ void Przepisywacz_z_tablic_transformaty_2krok_
     {
 
         for (int i = 0; i < device_tablica_ilosci_pasujacych_latek[blockIdx.z]; i++)
-            //³atka po ³atce przepsisujemy ³atki z  tablicy transformat device_tablice_transformaty_32_1krok(dla 1 kroku, dl 2 kroku device_tablice_transformaty_32 do t
+            //latka po latce przepsisujemy latki z  tablicy transformat device_tablice_transformaty_32_1krok(dla 1 kroku, dl 2 kroku device_tablice_transformaty_32 do t
         {
 
             int indeks_pomocniczy1_odkladanie_latek = index_2d_latki + (i * ROZMIAR_LATKI * ROZMIAR_LATKI);
@@ -505,7 +504,7 @@ __global__ void Przepisywacz_z_tablic_transformaty_2krok_
 
             __syncthreads();
         }
-        for (int i = 0; i < device_tablica_ilosci_pasujacych_latek[blockIdx.z]; i++)//³atka po ³atce przepsisujemy ³atki z  tablicy transformat device_tablice_transformaty_32_1krok(dla 1 kroku, dl 2 kroku device_tablice_transformaty_32 do t
+        for (int i = 0; i < device_tablica_ilosci_pasujacych_latek[blockIdx.z]; i++)//latka po latce przepsisujemy latki z  tablicy transformat device_tablice_transformaty_32_1krok(dla 1 kroku, dl 2 kroku device_tablice_transformaty_32 do t
         {
             int indeks_pomocniczy1_odkladanie_latek = index_2d_latki + (i * ROZMIAR_LATKI * ROZMIAR_LATKI);
             int indeks_pomocniczy2_odkladanie_latek = ((dev_koordynatySOA.koordynata_x[index_elmentu_zero_tablicy_koordynat + i] + index_x_pixela_gorny_lewy_obszaru_przeszukania) + col_pos) + ((dev_koordynatySOA.koordynata_y[index_elmentu_zero_tablicy_koordynat + i] + index_y_pixela_gorny_lewy_obszaru_przeszukania + row_pos) * szerokosc);
@@ -517,7 +516,7 @@ __global__ void Przepisywacz_z_tablic_transformaty_2krok_
         }
         //__syncthreads();
     }
-    for (int i = 0; i < device_tablica_ilosci_pasujacych_latek[blockIdx.z]; i++)//³atka po ³atce przepsisujemy ³atki z  tablicy transformat device_tablice_transformaty_32_1krok(dla 1 kroku, dl 2 kroku device_tablice_transformaty_32 do t
+    for (int i = 0; i < device_tablica_ilosci_pasujacych_latek[blockIdx.z]; i++)//latka po latce przepsisujemy latki z  tablicy transformat device_tablice_transformaty_32_1krok(dla 1 kroku, dl 2 kroku device_tablice_transformaty_32 do t
     {
         int indeks_pomocniczy1_odkladanie_latek = index_2d_latki + (i * ROZMIAR_LATKI * ROZMIAR_LATKI);
         int indeks_pomocniczy2_odkladanie_latek = ((dev_koordynatySOA.koordynata_x[index_elmentu_zero_tablicy_koordynat + i] + index_x_pixela_gorny_lewy_obszaru_przeszukania) + col_pos) + ((dev_koordynatySOA.koordynata_y[index_elmentu_zero_tablicy_koordynat + i] + index_y_pixela_gorny_lewy_obszaru_przeszukania + row_pos) * szerokosc);
@@ -651,7 +650,7 @@ __global__ void Filtr_Wienera(Obrazek_YCrCb device_tablica_wag_fitru_wienera, Ob
     }
 
     __syncthreads();
-    // opis filtu wienera wed³ug Dubowa zaka³a pos³y¿enie siê odwrotnoœci¹ sumy wartoœci wspó³czynników fitracji jako wag¹.Z testów wynika, ¿e efektywniejsz¹,a przedewszystkim szybsz¹ metod¹ jest wykorzystania jako wagi iloœci pasuj¹cych ³atek
+    // opis filtu wienera wedlug Dubowa zakala poslyzenie sie odwrotnoscia sumy wartosci wsp0lczynnik0w fitracji jako waga.Z test0w wynika, ze efektywniejsza,a przedewszystkim szybsza metoda jest wykorzystania jako wagi ilosci pasujacych latek
 
     if (indeks_w_grupie == 0)
     {
@@ -664,7 +663,7 @@ __global__ void Filtr_Wienera(Obrazek_YCrCb device_tablica_wag_fitru_wienera, Ob
 
 }
 
-__global__ void Nadpisywanie_marginesow1(Obrazek_YCrCb device_obrazek_po1kroku, int szerokosc, int wysokosc, int margines_lewy, int margines_prawy) //doanaie nowych marginesów
+__global__ void Nadpisywanie_marginesow1(Obrazek_YCrCb device_obrazek_po1kroku, int szerokosc, int wysokosc, int margines_lewy, int margines_prawy) //doanaie nowych margines0w
 {
 
     int row_pos = blockIdx.y * blockDim.y + threadIdx.y;
@@ -691,7 +690,7 @@ __global__ void Nadpisywanie_marginesow1(Obrazek_YCrCb device_obrazek_po1kroku, 
 
 }
 
-__global__ void Nadpisywanie_marginesow2(Obrazek_YCrCb device_obrazek_po1kroku, int szerokosc, int wysokosc, int margines_lewy, int margines_prawy) //dzielenie wyiku sumowania zerowanych ³atek zprzez ilosc zerowañ oraz doanaie nowych marginesów
+__global__ void Nadpisywanie_marginesow2(Obrazek_YCrCb device_obrazek_po1kroku, int szerokosc, int wysokosc, int margines_lewy, int margines_prawy) //dzielenie wyiku sumowania zerowanych latek zprzez ilosc zerowañ oraz doanaie nowych margines0w
 {
 
     int row_pos = blockIdx.y * blockDim.y + threadIdx.y;
@@ -734,7 +733,7 @@ __global__ void DzielenieMacierzy(Obrazek_YCrCb device_obrazek_po_n_kroku, Obraz
     }
 }
 
-__global__ void Zerowanie_Macierzy(Obrazek_YCrCb Obrazek, int szerokosc, int wysokosc) //dzielenie wyiku sumowania zerowanych ³atek zprzez ilosc zerowañ
+__global__ void Zerowanie_Macierzy(Obrazek_YCrCb Obrazek, int szerokosc, int wysokosc) //dzielenie wyiku sumowania zerowanych latek zprzez ilosc zerowañ
 {
 
     int row_pos = blockIdx.y * blockDim.y + threadIdx.y;
@@ -756,12 +755,14 @@ __global__ void Zerowanie_Macierzy(Obrazek_YCrCb Obrazek, int szerokosc, int wys
 
 void initializeCUDA(int argc, char** argv, int& devID)
 {
-    // By default, we use device 0, otherwise we override the device ID based on what is provided at the command line
+    
+    //funkcja na podstawie gotowego kodu udostepnionego na stronie :
+    //https://github.com/NVIDIA/cuda-samples/blob/master/Samples/4_CUDA_Libraries/matrixMulCUBLAS/matrixMulCUBLAS.cpp
+    //linie 149 - 178
+    
     cudaError_t error;
     devID = 0;
 
-
-    // get number of SMs on this GPU
     error = cudaGetDevice(&devID);
 
     if (error != cudaSuccess)
@@ -786,27 +787,7 @@ void initializeCUDA(int argc, char** argv, int& devID)
 
 }
 
-void dodanie_szumu(cv::Mat obrazek_zaszumiony, float sigm)
-{
 
-    double sigma = sigm; // Wartoœæ sigma dla szumu gaussowskiego
-
-    // Generator liczb losowych dla szumu gaussowskiego
-    std::default_random_engine generator;
-    std::normal_distribution<double> distribution(0.0, sigma);
-
-    // Dodaje szum gaussowski do ka¿dego piksela
-    for (int y = 0; y < obrazek_zaszumiony.rows; y++) {
-        for (int x = 0; x < obrazek_zaszumiony.cols; x++) {
-            cv::Vec3b& pixele = obrazek_zaszumiony.at<cv::Vec3b>(y, x);
-            for (int c = 0; c < 3; c++) {
-                double szum = distribution(generator);
-                int new_value = cv::saturate_cast<uchar>(pixele[c] + szum);
-                pixele[c] = new_value;
-            }
-        }
-    }
-}
 void funkcja_glowna(cv::Mat Obrazek, cv::Mat& Obrazek_odszumiony, float sigma, int szybkosc)
 {
     int szerokosc_obrazka_oryginalnego;
@@ -815,8 +796,8 @@ void funkcja_glowna(cv::Mat Obrazek, cv::Mat& Obrazek_odszumiony, float sigma, i
     int wielkosc_marginesu_prawego;
     int szerokosc_obrazka_z_marginesami;
     int wysokosc_obrazka_z_marginesami;
-    int p_hard = P_HARD; //przesyniêcie pomidzy ³atkami w kroku 1, w oryginale 1,2 lub 3, u Lebruna wynosi 3, w orginalnym opisie maksymalnie 4
-    int p_wien = P_WIEN;//przesuniêcie pomiêdzy ³atkami w kroku 2, w oryginale 1,2 lub 3, u Lebruna wynosi 3, w orginalnym opisie maksymalnie 4
+    int p_hard = P_HARD; //przesyniecie pomidzy latkami w kroku 1, w oryginale 1,2 lub 3, u Lebruna wynosi 3, w orginalnym opisie maksymalnie 4
+    int p_wien = P_WIEN;//przesuniecie pomiedzy latkami w kroku 2, w oryginale 1,2 lub 3, u Lebruna wynosi 3, w orginalnym opisie maksymalnie 4
     int zakladka_obszaru_przeszukania = 2;
     float tau_hard = 5000;
     float tau_wien = 800;
@@ -856,8 +837,8 @@ void funkcja_glowna(cv::Mat Obrazek, cv::Mat& Obrazek_odszumiony, float sigma, i
 
     if (szybkosc == 0)
     {
-        p_hard = P_HARD; //przesyniêcie pomidzy ³atkami w kroku 1, w oryginale 1,2 lub 3, u Lebruna wynosi 3, w orginalnym opisie maksymalnie 4
-        p_wien = P_WIEN;//przesuniêcie pomiêdzy ³atkami w kroku 2, w oryginale 1,2 lub 3, u Lebruna wynosi 3, w orginalnym opisie maksymalnie 4
+        p_hard = P_HARD; //przesyniecie pomidzy latkami w kroku 1, w oryginale 1,2 lub 3, u Lebruna wynosi 3, w orginalnym opisie maksymalnie 4
+        p_wien = P_WIEN;//przesuniecie pomiedzy latkami w kroku 2, w oryginale 1,2 lub 3, u Lebruna wynosi 3, w orginalnym opisie maksymalnie 4
         zakladka_obszaru_przeszukania = 2;
     }
     else if (szybkosc == 1)
@@ -878,7 +859,7 @@ void funkcja_glowna(cv::Mat Obrazek, cv::Mat& Obrazek_odszumiony, float sigma, i
     szerokosc_obrazka_z_marginesami = szerokosc_obrazka_oryginalnego + wielkosc_marginesu_lewego + wielkosc_marginesu_prawego;
     wysokosc_obrazka_z_marginesami = wysokosc_obrazka_oryginalnego + wielkosc_marginesu_lewego + wielkosc_marginesu_prawego;
     wielkosc_tablicy_z_marginesami = szerokosc_obrazka_z_marginesami * wysokosc_obrazka_z_marginesami;
-    ///////////////dodajemy "marginesy" do obrazka (po po³owie obszaru przeszukania po 16)////////////////////////       
+    ///////////////dodajemy "marginesy" do obrazka (po polowie obszaru przeszukania po 16)////////////////////////       
     cv::copyMakeBorder(Obrazek, Obrazek, wielkosc_marginesu_lewego, wielkosc_marginesu_prawego, wielkosc_marginesu_lewego, wielkosc_marginesu_prawego, cv::BORDER_REFLECT_101);
     cv::cvtColor(Obrazek, Obrazek, cv::COLOR_RGB2YCrCb);
     Obrazek.convertTo(Obrazek, CV_32FC3);
@@ -895,7 +876,7 @@ void funkcja_glowna(cv::Mat Obrazek, cv::Mat& Obrazek_odszumiony, float sigma, i
     wielkosc_tablicy_ilosci_pasujacych_latek = ilosc_blokow_w_boku_x * ilosc_blokow_w_boku_y;
     wielkosc_tablicy_zerowan = ilosc_blokow_w_boku_x * ilosc_blokow_w_boku_y;
     wielkosc_tablicy_koordynat = ilosc_blokow_w_boku_x * ilosc_blokow_w_boku_y * ROZMIAR_OBSZARU_PRZESZUKANIA * ROZMIAR_OBSZARU_PRZESZUKANIA;
-    ////////////////////////////////////////////przygotowanie i lokowanie w pamiêci obrazka i jego kolejnych wersji////////////////////////////////
+    ////////////////////////////////////////////przygotowanie i lokowanie w pamieci obrazka i jego kolejnych wersji////////////////////////////////
 
     Obrazek_YCrCb* wskaznik_host_Macierz_wejsciowa = &Host_Macierz_wejsciowa;
     wskaznik_host_Macierz_wejsciowa->kanal_Y = (float*)malloc(wielkosc_tablicy_z_marginesami * sizeof(float));
@@ -980,7 +961,7 @@ void funkcja_glowna(cv::Mat Obrazek, cv::Mat& Obrazek_odszumiony, float sigma, i
 
     int* Device_tablica_ilosci_pasujacych_latek;
     cudaMalloc(&Device_tablica_ilosci_pasujacych_latek, ilosc_blokow_w_boku_x * ilosc_blokow_w_boku_y * sizeof(int));
-    //////////////////////// kopiowane do pamiêci device
+    //////////////////////// kopiowane do pamieci device
 
    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1043,24 +1024,24 @@ void funkcja_glowna(cv::Mat Obrazek, cv::Mat& Obrazek_odszumiony, float sigma, i
 
             Przepisywacz_do_tablic_transformaty_ << <bloki_Przepisywacz, watki_Przepisywacz >> > (Dev_Macierz_wejsciowa, dev_koordynatySOA, Device_tablica_ilosci_pasujacych_latek, Device_tablice_transformaty_16, ilosc_blokow_w_boku_x, szerokosc_obrazka_z_marginesami, i, j, N_HARD);
 
-            ////////////////////////////////////////////// pasujêce ³atki znajduj¹ce siê w "device_tablice_transformaty_32_1krok" (tylko tyle z tej tablicy ile spe³nia warunek max dopasowania) poddajemy transformacie cosinusowej 2d (ca³e ³atki), a nastêpnie transformacie 1D walsha-hadamarda "w poprzek" grupy ³atek////////////////////////////////////////                       
+            ////////////////////////////////////////////// pasujece latki znajdujace sie w "device_tablice_transformaty_32_1krok" (tylko tyle z tej tablicy ile spelnia warunek max dopasowania) poddajemy transformacie cosinusowej 2d (cale latki), a nastepnie transformacie 1D walsha-hadamarda "w poprzek" grupy latek////////////////////////////////////////                       
 
             DCT << <bloki_DCT_krok1, watki_DCT_krok1 >> > (Device_tablice_transformaty_16, ROZMIAR_LATKI, ROZMIAR_LATKI, Device_tablica_ilosci_pasujacych_latek, N_HARD);
 
             int wielkosc_extern_sh_memory = sizeof(float) * (POWIERZCHNIA_LATKI * N_HARD);
-            Walsh_1D << <bloki_Walsh, watki_Walsh_krok1, wielkosc_extern_sh_memory >> > (Device_tablice_transformaty_16, Device_tablica_ilosci_pasujacych_latek, N_HARD); // przesuniêcie to indeks elentu zerowego w macierzy transformat dla danego wywo³ania kernela                                                                                                                                                                                       
-            /////////////////////////////////////////////////////////////// W przekszta³conych ³atkach zerujemy wspó³czynniki których abs jest mmniejszy ni¿ Lambda_Hard_3D*SIGMA/////////////////////////
+            Walsh_1D << <bloki_Walsh, watki_Walsh_krok1, wielkosc_extern_sh_memory >> > (Device_tablice_transformaty_16, Device_tablica_ilosci_pasujacych_latek, N_HARD); // przesuniecie to indeks elentu zerowego w macierzy transformat dla danego wywolania kernela                                                                                                                                                                                       
+            /////////////////////////////////////////////////////////////// W przeksztalconych latkach zerujemy wsp0lczynniki kt0rych abs jest mmniejszy niz Lambda_Hard_3D*SIGMA/////////////////////////
 
             Zerowanie_ << <bloki_Zerowanie, watki_Zerowanie >> > (Device_tablice_transformaty_16, Device_tablica_ilosci_zerowan, Device_tablica_ilosci_pasujacych_latek, wskaznik_dev_Szum_YCrCb, N_HARD);
 
-            ////////////////////////////////////////////////////////////// Odwracamy transformaty w celu uzyskania w³aœciwego obrazu//////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////// Odwracamy transformaty w celu uzyskania wlasciwego obrazu//////////////////////////////////////////////////////
 
 
             Walsh_1D << <bloki_Walsh, watki_Walsh_krok1, wielkosc_extern_sh_memory >> > (Device_tablice_transformaty_16, Device_tablica_ilosci_pasujacych_latek, N_HARD);
 
             DCT_odwrotna << <bloki_DCT_krok1, watki_DCT_krok1 >> > (Device_tablice_transformaty_16, ROZMIAR_LATKI, ROZMIAR_LATKI, Device_tablica_ilosci_pasujacych_latek, N_HARD);
 
-            ///// //////////////////////////teraz trzeba poodk³adaæ l³¹tki w odpowiednie miejsca tablicy wynikowej po 1 kroku, oraz pododawaæ wartoœci iliœci niewyzerowanych w jej dzielniku
+            ///// //////////////////////////teraz trzeba poodkladac llatki w odpowiednie miejsca tablicy wynikowej po 1 kroku, oraz pododawac wartosci ilisci niewyzerowanych w jej dzielniku
             Przepisywacz_z_tablic_transformaty_1krok_ << <bloki_Przepisywacz, watki_Przepisywacz >> > (Device_tablica_ilosci_zerowan, Dev_Obrazek_po_1kroku, Dev_Obrazek_Dzielnik, dev_koordynatySOA, Device_tablica_ilosci_pasujacych_latek, Device_tablice_transformaty_16, ilosc_blokow_w_boku_x, szerokosc_obrazka_z_marginesami, i, j, N_HARD);
 
         }
@@ -1089,13 +1070,13 @@ void funkcja_glowna(cv::Mat Obrazek, cv::Mat& Obrazek_odszumiony, float sigma, i
 
             Najmniejsze_liczby_ << <bloki_najmniejsze_liczby, watki_najmniejsze_liczby >> > (dev_koordynatySOA, Device_tablica_ilosci_pasujacych_latek, N_WIEN, tau_wien, true);
 
-            //przepisujemy ³atki z tablicy reprezentuj¹cej obrazek wejœciowego do "device_tablice_transformaty_32_1krok": 
+            //przepisujemy latki z tablicy reprezentujacej obrazek wejsciowego do "device_tablice_transformaty_32_1krok": 
             Przepisywacz_do_tablic_transformaty_ << <bloki_Przepisywacz, watki_Przepisywacz >> > (Dev_Macierz_wejsciowa, dev_koordynatySOA, Device_tablica_ilosci_pasujacych_latek, Device_tablice_transformaty_32_1krok, ilosc_blokow_w_boku_x, szerokosc_obrazka_z_marginesami, i, j, N_WIEN);
 
-            //przepisujemy ³atki z tablicy repezentuj¹cej obrazek wstêpnie odszumiony w 1 kroku do device_tablice_transformaty_32_2krok
+            //przepisujemy latki z tablicy repezentujacej obrazek wstepnie odszumiony w 1 kroku do device_tablice_transformaty_32_2krok
             Przepisywacz_do_tablic_transformaty_ << <bloki_Przepisywacz, watki_Przepisywacz >> > (Dev_Obrazek_po_1kroku, dev_koordynatySOA, Device_tablica_ilosci_pasujacych_latek, Device_tablice_transformaty_32_2krok, ilosc_blokow_w_boku_x, szerokosc_obrazka_z_marginesami, i, j, N_WIEN);
 
-            ////////////////////////////////////////////// pasujêce ³atki znajduj¹ce siê w "device_tablice_transformaty_32_1krok" (tylko tyle z tej tablicy ile spe³nia warunek max dopasowania) poddajemy transformacie cosinusowej 2d (ca³e ³atki), a nastêpnie transformacie 1D walsha-hadamarda "w poprzek" grupy ³atek////////////////////////////////////////
+            ////////////////////////////////////////////// pasujece latki znajdujace sie w "device_tablice_transformaty_32_1krok" (tylko tyle z tej tablicy ile spelnia warunek max dopasowania) poddajemy transformacie cosinusowej 2d (cale latki), a nastepnie transformacie 1D walsha-hadamarda "w poprzek" grupy latek////////////////////////////////////////
 
             DCT << <bloki_DCT_krok2, watki_DCT_krok2 >> > (Device_tablice_transformaty_32_1krok, Device_tablice_transformaty_32_2krok, ROZMIAR_LATKI, ROZMIAR_LATKI, Device_tablica_ilosci_pasujacych_latek, N_WIEN);
             int wielkosc_extern_sh_memory = sizeof(float) * (POWIERZCHNIA_LATKI * N_WIEN);
@@ -1107,7 +1088,7 @@ void funkcja_glowna(cv::Mat Obrazek, cv::Mat& Obrazek_odszumiony, float sigma, i
 
             DCT_odwrotna << <bloki_DCT_krok2, watki_DCT_krok2 >> > (Device_tablice_transformaty_32_2krok, ROZMIAR_LATKI, ROZMIAR_LATKI, Device_tablica_ilosci_pasujacych_latek, N_WIEN);
 
-            ///// //////////////////////////teraz trzeba poodk³adaæ l³¹tki w odpowiednie miejsca tablicy wynikowej po 1 kroku, oraz pododawaæ wartoœci iliœci niewyzerowanych w jej dzielniku
+            ///// //////////////////////////teraz trzeba poodkladac llatki w odpowiednie miejsca tablicy wynikowej po 1 kroku, oraz pododawac wartosci ilisci niewyzerowanych w jej dzielniku
             Przepisywacz_z_tablic_transformaty_2krok_ << <bloki_Przepisywacz, watki_Przepisywacz >> > (Device_tablica_wartosci_fitru_wienera, Dev_Obrazek_po_2kroku, Dev_Obrazek_Dzielnik, dev_koordynatySOA, Device_tablica_ilosci_pasujacych_latek, Device_tablice_transformaty_32_2krok, ilosc_blokow_w_boku_x, szerokosc_obrazka_z_marginesami, i, j, N_WIEN);
             //   (device_tablica_wag_fitru_wienera,obrazek_po_kolejnym_kroku, obrazek_po_kolejnym_kroku_dzielnik, sigma, Tablice_koordynatLatek dev_koordynatySOA, device_tablica_ilosci_pasujacych_latek, float* device_tablice_transformaty_32_2krok, int ilosc_blokow_w_boku_x, int ilosc_blokow_w_boku_y, int szerokosc, int i, int j, int mnoznik_tablicy_transormat
         }
@@ -1265,7 +1246,7 @@ int main(int argc, char* argv[])
 			std::cout << "Argumenty:\n";
 			std::cout << "  <nazwa pliku>         Nazwa pliku. Mozna podac nazwe i sciezke folderu lub sama nazwe \n";
 			std::cout << "                        jezeli znajduje sie w jednym folderze z programem\n";
-			std::cout << "                        -zostan¹ przetworzone wszystkie pliki graficzne w folderze\n";
+			std::cout << "                        -zostana przetworzone wszystkie pliki graficzne w folderze\n";
 			std::cout << "  <poziom szumu>        Liczba calkowita: 0 do 100\n";
 			std::cout << "  <stala filtracji>	Liczba calkowita: sila odzumiania";
 			return 0;
@@ -1273,7 +1254,7 @@ int main(int argc, char* argv[])
 
     if (argc != 4) 
 	{
-        std::cerr << "U¿ycie: " << argv[0] << " <nazwa pliku> <poziom szumu> <normalny czy szybki?>\n pomoc: --help lub -h";
+        std::cerr << "Uzycie: " << argv[0] << " <nazwa pliku> <poziom szumu> <normalny czy szybki?>\n pomoc: --help lub -h";
         cv::waitKey(0);
         return 1;
     }
@@ -1330,22 +1311,17 @@ int main(int argc, char* argv[])
                 funkcja_glowna(Obrazek, Obrazek_odszumiony, sigma, tryb_szybkosci);
                 for (std::filesystem::path plik : {std::filesystem::absolute(std::filesystem::path(entry))})
                 {
-                    //std::cerr << "przetwarzam sekwencje" << std::endl;
                     std::string nowa_nazwa = plik.stem().string() + "_filtered" + plik.extension().string();
                     std::string nowa_sciezka = plik.parent_path().string() + "/" + "filtered";
                     std::string nowa_nazwa_i_sciezka = nowa_sciezka + "/" + nowa_nazwa;
-                    //std::cerr << "rozszerzenie:" << plik.extension().string() << std::endl;
-                    //std::cerr << "sciezka" << nowa_nazwa_i_sciezka << std::endl;
-                    // Zapis przetworzonego obrazu
-                    //cv::imshow("Obrazek po 2 kroku", Obrazek_odszumiony);
                     if (!std::filesystem::exists(nowa_sciezka)) //sprawdza czy istnieje folder do apisania wynikowych obrazow
                     {
                         if (std::filesystem::create_directories(nowa_sciezka)) {
                             std::cerr << "Utworzono folder: " << nowa_sciezka << std::endl;
                         }
                         else {
-                            std::cerr << "Nie udalo siê utworzyc folderu: " << nowa_sciezka << std::endl;
-                            return 1; // Zakoñczenie programu z b³êdem
+                            std::cerr << "Nie udalo sie utworzyc folderu: " << nowa_sciezka << std::endl;
+                            return 1; // Zakoñczenie programu z bledem
                         }
                     }
                     cv::imwrite(nowa_nazwa_i_sciezka, Obrazek_odszumiony);
@@ -1357,7 +1333,7 @@ int main(int argc, char* argv[])
         }
     }
     else {
-        std::cerr << "Podana œcie¿ka lub nazwa pliku  jest bledna" << std::endl;
+        std::cerr << "Podana sciezka lub nazwa pliku  jest bledna" << std::endl;
         return 1;
     }
     time_t czasStop = clock();

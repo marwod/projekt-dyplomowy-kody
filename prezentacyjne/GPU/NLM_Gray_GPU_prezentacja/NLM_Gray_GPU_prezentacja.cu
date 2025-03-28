@@ -13,7 +13,6 @@ marwod@interia.pl
 #include <time.h>
 #include <iostream>
 #include <cmath>
-#include <conio.h>
 #include <math.h>
 #include <cmath>
 #include "opencv2/opencv.hpp"
@@ -51,7 +50,7 @@ __global__ void Device_Non_Local_Means(float* __restrict__ device_obrazek_poczat
 
     extern __shared__ float okienko[];
     float* okienko_referencyjne = (float*)&okienko[0];
-    float* Okno_preszukana_shared = (float*)&okienko[wielkosc_okna_podobienstwa * wielkosc_okna_podobienstwa]; //okno ma wilekosć rzeczywistego obszaru przeszukania
+    float* Okno_preszukana_shared = (float*)&okienko[wielkosc_okna_podobienstwa * wielkosc_okna_podobienstwa]; //okno ma wilekosc rzeczywistego obszaru przeszukania
 
     float* tablica_wartosci_pikseli = (float*)&Okno_preszukana_shared[rzeczywisty_obszar_przeszukania * rzeczywisty_obszar_przeszukania];
     float* tablica_wag_pikseli = (float*)&tablica_wartosci_pikseli[wielkosc_okna_przeszukania * wielkosc_okna_przeszukania];
@@ -59,7 +58,7 @@ __global__ void Device_Non_Local_Means(float* __restrict__ device_obrazek_poczat
             suma_wag = 0;
             suma_pikseli = 0;
 
-            int index_x_pixela_gorny_lewy_obszaru_przeszukania = blockIdx.x ;//przetestować czy blo z czy y czy jeden i drugi!!!!!!!
+            int index_x_pixela_gorny_lewy_obszaru_przeszukania = blockIdx.x ;//przetestowac czy blo z czy y czy jeden i drugi!!!!!!!
             int index_y_pixela_gorny_lewy_obszaru_przeszukania = blockIdx.y;
             int index_x_pixela_przetwarzanego = blockIdx.x  + wielkosc_marginesu_lewego;
             int index_y_pixela_przetwarzanego = blockIdx.y  + wielkosc_marginesu_lewego;
@@ -68,22 +67,22 @@ __global__ void Device_Non_Local_Means(float* __restrict__ device_obrazek_poczat
             if ((threadIdx.x < wielkosc_okna_przeszukania) && (threadIdx.y < wielkosc_okna_przeszukania))
             {
                 Okno_preszukana_shared[threadIdx.y * rzeczywisty_obszar_przeszukania + threadIdx.x] = (device_obrazek_poczatkowy[(threadIdx.y + index_y_pixela_gorny_lewy_obszaru_przeszukania) * szerokosc + threadIdx.x + index_x_pixela_gorny_lewy_obszaru_przeszukania]);
-                //przpisujemy obszar preszukania (37 pixeli) dla łatki do pamięci dzielonej bloku, ze względu na zmieszczenie się w dostępnej w wywołaniu funkcji iosci wątków musiałem zrealizować przypisanie w czterech krokach.
+                //przpisujemy obszar preszukania (37 pixeli) dla latki do pamieci dzielonej bloku, ze wzgledu na zmieszczenie sie w dostepnej w wywolaniu funkcji iosci watkow musialem zrealizowac przypisanie w czterech krokach.
             }
             __syncthreads();
-            if ((threadIdx.x < wielkosc_okna_przeszukania) && (threadIdx.y < (rzeczywisty_obszar_przeszukania - wielkosc_okna_przeszukania))) //przpisujemy obszar łatki do ktorej będziemy porownywać do pamięci dzielonej bloku
+            if ((threadIdx.x < wielkosc_okna_przeszukania) && (threadIdx.y < (rzeczywisty_obszar_przeszukania - wielkosc_okna_przeszukania))) //przpisujemy obszar latki do ktorej bedziemy porownywac do pamieci dzielonej bloku
             {
 
                 Okno_preszukana_shared[(threadIdx.y + wielkosc_okna_przeszukania) * rzeczywisty_obszar_przeszukania + threadIdx.x] = (device_obrazek_poczatkowy[((threadIdx.y + wielkosc_okna_przeszukania) + index_y_pixela_gorny_lewy_obszaru_przeszukania) * szerokosc + threadIdx.x + index_x_pixela_gorny_lewy_obszaru_przeszukania]);
             }
             __syncthreads();
-            if ((threadIdx.x < (rzeczywisty_obszar_przeszukania - wielkosc_okna_przeszukania)) && (threadIdx.y < wielkosc_okna_przeszukania)) //przpisujemy obszar łatki do ktorej będziemy porownywać do pamięci dzielonej bloku
+            if ((threadIdx.x < (rzeczywisty_obszar_przeszukania - wielkosc_okna_przeszukania)) && (threadIdx.y < wielkosc_okna_przeszukania)) //przpisujemy obszar latki do ktorej bedziemy porownywac do pamieci dzielonej bloku
             {
 
                 Okno_preszukana_shared[(threadIdx.y)*rzeczywisty_obszar_przeszukania + threadIdx.x + wielkosc_okna_przeszukania] = (device_obrazek_poczatkowy[(threadIdx.y + index_y_pixela_gorny_lewy_obszaru_przeszukania) * szerokosc + threadIdx.x + wielkosc_okna_przeszukania + index_x_pixela_gorny_lewy_obszaru_przeszukania]);;
             }
             __syncthreads();
-            if ((threadIdx.x < (rzeczywisty_obszar_przeszukania - wielkosc_okna_przeszukania)) && (threadIdx.y < (rzeczywisty_obszar_przeszukania - wielkosc_okna_przeszukania))) //przpisujemy obszar łatki do ktorej będziemy porownywać do pamięci dzielonej bloku
+            if ((threadIdx.x < (rzeczywisty_obszar_przeszukania - wielkosc_okna_przeszukania)) && (threadIdx.y < (rzeczywisty_obszar_przeszukania - wielkosc_okna_przeszukania))) //przpisujemy obszar latki do ktorej bedziemy porownywac do pamieci dzielonej bloku
             {
                 Okno_preszukana_shared[(threadIdx.y + wielkosc_okna_przeszukania) * rzeczywisty_obszar_przeszukania + threadIdx.x + wielkosc_okna_przeszukania] = (device_obrazek_poczatkowy[((threadIdx.y + wielkosc_okna_przeszukania) + index_y_pixela_gorny_lewy_obszaru_przeszukania) * szerokosc + threadIdx.x + wielkosc_okna_przeszukania + index_x_pixela_gorny_lewy_obszaru_przeszukania]);;
             }
@@ -91,7 +90,7 @@ __global__ void Device_Non_Local_Means(float* __restrict__ device_obrazek_poczat
 
             int ofset = wielkosc_okna_przeszukania / 2;
 
-            if ((threadIdx.x < wielkosc_okna_podobienstwa) && (threadIdx.y < wielkosc_okna_podobienstwa)) //przpisujemy obszar łatki do ktorej będziemy porownywać do pamięci dzielonej bloku
+            if ((threadIdx.x < wielkosc_okna_podobienstwa) && (threadIdx.y < wielkosc_okna_podobienstwa)) //przpisujemy obszar latki do ktorej bedziemy porownywac do pamieci dzielonej bloku
             {
                 okienko_referencyjne[threadIdx.y * wielkosc_okna_podobienstwa + threadIdx.x] = Okno_preszukana_shared[(threadIdx.y + ofset) * (rzeczywisty_obszar_przeszukania)+(threadIdx.x + ofset)];
 
@@ -170,6 +169,10 @@ __global__ void Device_Non_Local_Means(float* __restrict__ device_obrazek_poczat
 
 void initializeCUDA(int argc, char** argv, int& devID )
 {
+    //funkcja na podstawie gotowego kodu udostepnionego na stronie :
+    //https://github.com/NVIDIA/cuda-samples/blob/master/Samples/4_CUDA_Libraries/matrixMulCUBLAS/matrixMulCUBLAS.cpp
+    //linie 149 - 178
+    
     // By default, we use device 0, otherwise we override the device ID based on what is provided at the command line
     cudaError_t error;
     devID = 0;
@@ -203,12 +206,12 @@ void initializeCUDA(int argc, char** argv, int& devID )
 void dodanie_szumu(cv::Mat obrazek_zaszumiony, float sigm, int ilosc_kanalow)
 {
 
-    double sigma = sigm; // Wartość sigma dla szumu gaussowskiego
+    double sigma = sigm; // Wartosc sigma dla szumu gaussowskiego
 
     // Generator liczb losowych dla szumu gaussowskiego
     std::default_random_engine generator;
     std::normal_distribution<double> distribution(0.0, sigma);
-    // Dodaje szum gaussowski do każdego piksela
+    // Dodaje szum gaussowski do kazdego piksela
     for (int y = 0; y < obrazek_zaszumiony.rows; y++)
     {
         for (int x = 0; x < obrazek_zaszumiony.cols; x++)
@@ -219,8 +222,8 @@ void dodanie_szumu(cv::Mat obrazek_zaszumiony, float sigm, int ilosc_kanalow)
                 for (int c = 0; c < 1; c++)
                 {
                     double szum = distribution(generator);
-                    int new_value = cv::saturate_cast<uchar>(pixele[c] + szum);
-                    pixele[c] = new_value;
+                    int nowa_wartosc = cv::saturate_cast<uchar>(pixele[c] + szum);
+                    pixele[c] = nowa_wartosc;
                 }
             }
             else
@@ -229,8 +232,8 @@ void dodanie_szumu(cv::Mat obrazek_zaszumiony, float sigm, int ilosc_kanalow)
                 for (int c = 0; c < 3; c++)
                 {
                     double szum = distribution(generator);
-                    int new_value = cv::saturate_cast<uchar>(pixele[c] + szum);
-                    pixele[c] = new_value;
+                    int nowa_wartosc = cv::saturate_cast<uchar>(pixele[c] + szum);
+                    pixele[c] = nowa_wartosc;
                 }
             }
 
@@ -350,7 +353,7 @@ int main(int argc, char** argv)
     std::string odpowiedz2;
     do
     {
-        std::cout << "czy od sumy dystansow pomiędzy pikselami odjac 2*sigma*sigma?" << std::endl;
+        std::cout << "czy od sumy dystansow pomiedzy pikselami odjac 2*sigma*sigma?" << std::endl;
         std::cout << "tak, wcisnij t" << std::endl;
         std::cout << "nie, wcisnij n" << std::endl;
         std::cin >> odpowiedz2;
@@ -432,7 +435,7 @@ Bodues = true;
 
 
 
-    /////////////////////////////////////////////////////////////////dodajemy "marginesy" do obrazka (po połowie obszaru przeszukania -po16)////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////dodajemy "marginesy" do obrazka (po polowie obszaru przeszukania -po16)////////////////////////////////////////////////////
     szerokosc_obrazka_oryginalnego = ObrazekSzary.cols;
     //std::cout << szerokosc_obrazka_oryginalnego << std::endl;
     wysokosc_obrazka_oryginalnego = ObrazekSzary.rows;
@@ -465,8 +468,8 @@ Bodues = true;
     float* device_obrazek_poczatkowy = new float[wielkosc_tablicy_z_marginesami];
     cudaMalloc((void**)&device_obrazek_poczatkowy, array_byte_size);
     
-    ////////////////////////////////////////////przygotowanie i lokowanie w pamięci tablic pomocniczych////////////////////////////////
-    /////////lokujemy je w pamięci przed rozpoczęciem wykonywania programu przez kartę gdyż dynamiczne lokowanie pamięci przez CUDĘ wielokrotnie spowalnia program///////////////
+    ////////////////////////////////////////////przygotowanie i lokowanie w pamieci tablic pomocniczych////////////////////////////////
+    /////////lokujemy je w pamieci przed rozpoczeciem wykonywania programu przez karte gdyz dynamiczne lokowanie pamieci przez CUDE wielokrotnie spowalnia program///////////////
     
 
    ////////////////
