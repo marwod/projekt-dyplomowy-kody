@@ -5,7 +5,7 @@ Ten projekt zawiera implementację filtrów odszumiających **BM3D** oraz **NLM*
 ---
 
 ## 🧪 Zawartość
-Kody i binarja.
+Kody i binaria.
 
 Struktura folderów:
 
