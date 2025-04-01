@@ -37,7 +37,7 @@ obrazki_testowe.7z
 
 - CUDA C++
 - Kompilacja z użyciem: NVCC / g++ / Visual Studio / CMake
-- Testowano na: **RTX 4060 Mobile**, Ubuntu 22.04 (WSL) i Windows 11
+- Testowano na: **GTX 1650 Super**, **RTX 4060 Mobile**, Ubuntu 22.04 (WSL) i Windoes 10/Windows 11
 
 ---
 
